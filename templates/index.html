@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Welcome to Sonet</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link href="{{ url_for("static", filename = "styles/globals.css") }}" rel="stylesheet">
+		<link href="{{ url_for("static", filename = "styles/index.css") }}" rel="stylesheet">
+
+		<script src="{{ url_for("static", filename = "material_ui/js/materialize.js") }}" defer></script>
+	</head>
+	<body>
+		<div class = "main-container">
+			<h1>Login to Sonet</h1>
+			<form class = "login-form" action = "/api_login" method = "POST">
+				<input type="text" name="user_id" placeholder="Enter User ID">
+				<input type="text" name="password" placeholder="Enter Password">
+				<input type="submit" value="Login">
+			</form>
+		</div>
+	</body>
+</html>
