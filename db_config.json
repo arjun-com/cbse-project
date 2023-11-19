@@ -1,0 +1,6 @@
+{
+	"username": "school-admin",
+	"password": "school_password",
+	"database": "schoolProjectDB",
+	"host": "127.0.0.1"
+}
