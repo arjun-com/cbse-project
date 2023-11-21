@@ -3,9 +3,11 @@ import jwt
 import json
 import datetime
 
-from classes import User
 from db_connection import init_conn
 from db_methods import *
+from hash_utils import hash_password
+
+conn = init_conn()
 
 try:
     jwt_secret_key = json.load(open("./jwt_config.json", "r"))["secret_key"]
@@ -23,10 +25,20 @@ def index():
 def login():
     user_data = request.form
 
-    # Implement user validity check here.
+    user_login_details = {
+        "email": user_data["email"],
+        "password": hash_password(user_data["password"])
+    }
 
-    jwt_token = jwt.encode({"username": user_data["user_id"], "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1)}, jwt_secret_key, algorithm = "HS256")
+    user_details = get_user(conn, user_login_details)
+    if user_details == None:
+        return "Invalid creds"
 
-    return render_template("dashboard.html", token = jwt_token)
+    jwt_token = jwt.encode({"uuid": user_details[-1], "exp": datetime.datetime.utcnow() + datetime.timedelta(days = 1)}, jwt_secret_key, algorithm = "HS256")
+
+    user_details = list(user_details)
+    user_details.pop(1) # To remove password hash before transferring all other data to client.
+
+    return render_template("dashboard.html", token = jwt_token, user = user_details)
 
 app.run(debug = True, host = "0.0.0.0", port = 8080)

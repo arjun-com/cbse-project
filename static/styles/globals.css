@@ -1,11 +1,5 @@
 @charset "UTF-8";
-/*!
- * Pico CSS v1.5.9 (https://picocss.com)
- * Copyright 2019-2023 - Licensed under MIT
- */
-/**
- * Theme: default
- */
+
 :root {
   --font-family: system-ui, -apple-system, "Segoe UI", "Roboto", "Ubuntu",
     "Cantarell", "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
@@ -2645,9 +2639,6 @@ textarea,
   direction: rtl;
 }
 
-/**
-* Reduce Motion Features
-*/
 @media (prefers-reduced-motion: reduce) {
   *:not([aria-busy=true]),
   :not([aria-busy=true])::before,
@@ -2662,4 +2653,3 @@ textarea,
   }
 }
 
-/*# sourceMappingURL=pico.css.map */
