@@ -2,7 +2,6 @@ from flask import Flask, render_template, request
 import jwt
 import json
 import datetime
-
 from db_connection import init_conn
 from db_methods import *
 from hash_utils import hash_password
@@ -30,7 +29,7 @@ def login():
         "password": hash_password(user_data["password"])
     }
 
-    user_details = get_user(conn, user_login_details)
+    user_details = get_user_from_login(conn, user_login_details)
     if user_details == None:
         return "Invalid creds"
 
@@ -40,5 +39,32 @@ def login():
     user_details.pop(1) # To remove password hash before transferring all other data to client.
 
     return render_template("dashboard.html", token = jwt_token, user = user_details)
+
+@app.get("/api_get_assignments")
+def get_assignments():
+    jwt_token = request.args.get("token")
+    if jwt_token == None:
+        return "No token in url."
+
+    data = jwt.decode(jwt_token, jwt_secret_key, algorithms = ["HS256"])
+    uuid = data["uuid"]
+    
+    user = get_user_from_uuid(conn, uuid)
+    if user == None:
+        return "Invalid jwt token supplied"
+
+    class_details = {
+        "grade": user[3], # 2, 3, 4 are the indices as per the database columns for the assignments table.
+        "section": user[4],
+        "school": user[2]
+    }
+
+    assignments = get_assignments_from_class_details(conn, class_details)
+    if assignments == None:
+        return f"No assignments."
+
+    return render_template("partials/assignments.html", token = jwt_token, len_assignments = len(assignments), assignments = assignments)
+    
+
 
 app.run(debug = True, host = "0.0.0.0", port = 8080)

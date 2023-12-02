@@ -1,3 +1,17 @@
 .hidden {
 	display: none;
 }
+
+section {
+	margin: 2vh 2vw;
+	padding: 2vh 2vw;
+}
+
+iframe {
+	height: 50vh;
+}
+
+.assignments-container {
+	background: var(--switch-background-color);
+	width: fit-content;
+}

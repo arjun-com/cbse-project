@@ -1,0 +1,13 @@
+html {
+	background: var(--switch-background-color);
+}
+
+body {
+	background: var(--switch-background-color);
+}
+
+.assignment-container {
+	background: var(--secondary);
+	margin: 2vh 2vw;
+	padding: 1vh 1vw;
+}

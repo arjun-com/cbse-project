@@ -9,5 +9,18 @@
 	</head>
 	<body>
 		<h1>Welcome to your dashboard.</h1>
+		<section class = "assignments-container">
+			<h2>Your Assignments</h2>
+			<iframe src = "/api_get_assignments?token={{ token }}" title = "assignments section">
+			</iframe>
+		</section>
 	</body>
+
+	<script>
+		function setJwtToken() {
+			localStorage.setItem("token", "{{ token }}")
+		}
+
+		setJwtToken()
+	</script>
 </html>

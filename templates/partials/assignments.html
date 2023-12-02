@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Welcome to Sonet</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link href="{{ url_for("static", filename = "styles/globals.css") }}" rel="stylesheet">
+		<link href="{{ url_for("static", filename = "styles/partials/assignments.css") }}" rel="stylesheet">
+	</head>
+	<body>
+		{% for i in range(0, len_assignments) %}
+			<div class = "assignment-container">
+				<p class = "assignment-subject">{{ assignments[i][1] }}</p>
+				<p class = "assignment-startdate">Start: {{ assignments[i][2] }}</p>
+				<p class = "assignment-enddate">End: {{ assignments[i][3] }}</p>
+				<a href="/api_download_assignment?assignment_id={{ assignments[i][0] }}">Download Assignment</a> <!-- This feature has not been implemented on the server-side yet. -->
+			</div>
+		{% endfor %}
+	</body>
+</html>
