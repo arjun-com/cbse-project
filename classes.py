@@ -1,4 +1,4 @@
-class User:
+class User: # Still havent found a use for this will be used in code later.
     def __init__(self, username, password, user_id, school, grade, section, dob):
         self.username = username,
         self.password = password,
@@ -7,4 +7,3 @@ class User:
         self.grade = grade,
         self.section = section,
         self.dob = dob
-        self.

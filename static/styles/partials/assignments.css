@@ -7,7 +7,37 @@ body {
 }
 
 .assignment-container {
-	background: var(--secondary);
+	background: var(--background);
 	margin: 2vh 2vw;
-	padding: 1vh 1vw;
+	padding: 2vh 2vw;
+	border: 2px solid var(--primary);
+}
+
+.assignment-container:hover {
+	transform: translateY(-2%);
+	box-shadow: 0 10px 10px var(--hover-color);
+}
+
+.assignment-container > ul {
+	transform: translateX(10%);
+}
+
+.assignment-container > ul > li > p {
+	color: var(--secondary);
+	text-transform: capitalize;
+}
+
+.assignment-download-btn {
+	text-decoration: none;
+	transition: 0.5s;
+	font-weight: bold;
+	color: var(--highlight);
+}
+
+.assignment-download-btn:hover {
+	color: green;
+}
+
+.assignment-field-value {
+	color: var(--text-color);
 }

@@ -2,16 +2,41 @@
 	display: none;
 }
 
+.user-icon {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	width: 70px;
+	border: 1px solid var(--primary);
+	border-radius: 50%;
+	cursor: pointer;
+	padding: 10px;
+	transition: 0.25s;
+}
+
+.user-icon:hover {
+	top: 10px;
+	box-shadow: 0 10px 5px var(--hover-color);
+}
+
 section {
 	margin: 2vh 2vw;
 	padding: 2vh 2vw;
+	border: 2px solid var(--primary);
+}
+
+section:hover {
+	transform: translateY(-2%);
+	box-shadow: 0 10px 10px var(--hover-color);
 }
 
 iframe {
 	height: 50vh;
+	margin: 20px 0;
+	outline: none;
+	border: none;
 }
 
 .assignments-container {
-	background: var(--switch-background-color);
 	width: fit-content;
 }

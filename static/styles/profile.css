@@ -1,0 +1,25 @@
+section {
+	border: 2px solid var(--primary);
+	width: 90%;
+	height: 90%;
+	padding: 100px;
+	margin: auto;
+	margin-top: 75px;
+	box-sizing: border-box;
+}
+
+.user-icon {
+	width: 120px;
+	border: 2px solid var(--primary);
+	border-radius: 50%;
+	padding: 20px;
+}
+
+li {
+	list-style-type: none;
+	margin: 20px 0;
+	width: fit-content;
+	border-bottom: 2px solid var(--primary);
+	padding: 10px 20px;
+}
+
