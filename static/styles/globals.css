@@ -13,6 +13,10 @@
 	transition: 0.35s;
 }
 
+h1, h2, h3, h4, h5, h6 {
+	width: fit-content;
+}
+
 a, button, input[type=submit] {
 	cursor: pointer;
 }
@@ -23,6 +27,7 @@ input {
 	border: 2px solid black;
 	outline: none;
 	margin: 10px 0;
+	box-sizing: border-box;
 }
 
 input:focus {
@@ -31,4 +36,9 @@ input:focus {
 
 input::placeholder {
 	color: var(--secondary);
+}
+
+select {
+	width: 400px;
+	font-size: 20px;
 }

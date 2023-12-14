@@ -37,6 +37,10 @@ iframe {
 	border: none;
 }
 
-.assignments-container {
+.student-assignments-container {
+	width: fit-content;
+}
+
+.teacher-assignments-container {
 	width: fit-content;
 }

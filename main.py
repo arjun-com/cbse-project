@@ -2,9 +2,13 @@ from flask import Flask, render_template, request
 import jwt
 import json
 import datetime
+import os
 from db_connection import init_conn
 from db_methods import *
 from hash_utils import hash_password
+
+ASSIGNMENTS_DIR = "./static/user_content/assignments/"
+ALLOWED_ASSIGNMENTS_EXTENSIONS = ["pdf"]
 
 conn = init_conn()
 
@@ -15,6 +19,16 @@ except:
 assert jwt_secret_key != "" and jwt_secret_key != None, "secret jwt key must have a valid value."
 
 app = Flask(__name__)
+
+
+
+def class_to_grade_and_section(class_):
+    # Named as class_ as class is a reserved keyword.
+    if len(class_) == 2:
+        return (class_[ : 1], class_[1 : ])
+    if len(class_) == 3:
+        return (class_[ : 2], class_[2 :])
+    return (None, None)
 
 def validate_and_get_uuid_jwt_token(token):
     try:
@@ -44,16 +58,16 @@ def get_assignments():
         return "Invalid jwt token supplied"
 
     class_details = {
-        "grade": user[3], # 2, 3, 4 are the indices as per the database columns for the assignments table.
-        "section": user[4],
-        "school": user[2]
+        "grade": user["grade"], # 2, 3, 4 are the indices as per the database columns for the assignments table.
+        "section": user["section"],
+        "school": user["school"]
     }
 
     assignments = get_assignments_from_class_details(conn, class_details)
     if assignments == None:
         return "No assignments."
 
-    return render_template("partials/assignments.html", token = jwt_token, len_assignments = len(assignments), assignments = assignments)
+    return render_template("partials/student_assignments.html", token = jwt_token, len_assignments = len(assignments), assignments = assignments)
 
 @app.get("/api_download_assignment")
 def download_assignment():
@@ -102,11 +116,75 @@ def login():
     if user_details == None:
         return "Invalid creds"
 
-    jwt_token = jwt.encode({"uuid": user_details[-1], "exp": datetime.datetime.utcnow() + datetime.timedelta(days = 1)}, jwt_secret_key, algorithm = "HS256")
+    jwt_token = jwt.encode({"uuid": user_details["uuid"], "exp": datetime.datetime.utcnow() + datetime.timedelta(days = 1)}, jwt_secret_key, algorithm = "HS256")
 
-    user_details = list(user_details)
-    user_details.pop(1) # To remove password hash before transferring all other data to client.
+    if user_details["role"] == "student":
+        return render_template("student_dashboard.html", token = jwt_token, user = user_details)
 
-    return render_template("dashboard.html", token = jwt_token, user = user_details)
+    elif user_details["role"] == "teacher":    
+        teaching_classes = user_details["teaching_classes"]
+        if teaching_classes != None:
+            teaching_classes =  [ _.strip() for _ in user_details["teaching_classes"].split(",") ]
+        return render_template("teacher_dashboard.html", token = jwt_token, user = user_details, teaching_classes = teaching_classes)
+
+    else:
+        return "A dashboard for this user role has not been created yet."
     
+@app.post("/api_upload_assignment")
+def upload_assignment():
+    jwt_token = request.args.get("token")
+    if jwt_token == None:
+        return "No token in url."
+
+    uuid = validate_and_get_uuid_jwt_token(jwt_token)
+    if uuid == None:
+        return "Invalid token supplied."
+    
+    user = get_user_from_uuid(conn, uuid)
+    if user == None:
+        return "Invalid jwt token supplied"
+
+    if request.form["class"] not in user["teaching_classes"]:
+        return "You cannot publish an assignment to that class."
+
+    file = request.files["file"]
+    if file.filename == "":
+        return "No file selected. Refresh the page."
+
+    if not("." in file.filename and file.filename.rsplit(".")[1].lower() in ALLOWED_ASSIGNMENTS_EXTENSIONS):
+        return "File has an invalid extension, upload only pdf files. Refresh the page."
+
+    if request.form["class"] == "":
+        return "Choose a class to assign the assignment to. Refresh the page."
+
+    user = get_user_from_uuid(conn, uuid)
+    if user == None:
+        return "This user does not exist."
+
+    school = user["school"]
+    grade, section = class_to_grade_and_section(request.form["class"])
+    if grade == None or section == None:
+        return "Invalid class selected. Refresh the page"
+
+    assignment_details = {
+        "school": school,
+        "grade": grade,
+        "section": section,
+        "startdate": request.form["startdate"],
+        "enddate": request.form["enddate"],
+        "subject": request.form["subject"]
+    }
+
+    uaid = get_latest_uaid_for_school(conn, school) + 1
+    try:
+        file.save(os.path.join(ASSIGNMENTS_DIR, f"{uaid}.pdf"))
+    except:
+        return("An error occurred while storing the file. Refresh the page.")
+
+    db_resp_code = add_assignment(conn, assignment_details)
+    if db_resp_code == 0:
+        return "Successfully published assignment. Refresh the page."
+    else:
+        return "An error occurred while publishing the assignment. Refresh the page."
+        
 app.run(debug = True, host = "0.0.0.0", port = 8080)
