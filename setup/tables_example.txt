@@ -1,43 +1,8 @@
-MariaDB [schoolProjectDB]> describe users;
-+----------+--------------+------+-----+---------+----------------+
-| Field    | Type         | Null | Key | Default | Extra          |
-+----------+--------------+------+-----+---------+----------------+
-| username | varchar(100) | NO   |     | NULL    |                |
-| password | varchar(512) | NO   |     | NULL    |                |
-| school   | varchar(50)  | NO   |     | NULL    |                |
-| grade    | int(11)      | NO   |     | NULL    |                |
-| section  | varchar(10)  | YES  |     | NULL    |                |
-| dob      | varchar(20)  | YES  |     | NULL    |                |
-| email    | varchar(100) | NO   |     | NULL    |                |
-| role     | varchar(50)  | NO   |     | NULL    |                |
-| uuid     | int(11)      | NO   | PRI | NULL    | auto_increment |
-+----------+--------------+------+-----+---------+----------------+
-
-MariaDB [schoolProjectDB]> describe assignments;
-+-----------+--------------+------+-----+---------+----------------+
-| Field     | Type         | Null | Key | Default | Extra          |
-+-----------+--------------+------+-----+---------+----------------+
-| uaid      | int(11)      | NO   | PRI | NULL    | auto_increment |
-| subject   | varchar(50)  | YES  |     | NULL    |                |
-| startdate | varchar(50)  | YES  |     | NULL    |                |
-| enddate   | varchar(50)  | YES  |     | NULL    |                |
-| grade     | int(11)      | NO   |     | NULL    |                |
-| section   | varchar(2)   | YES  |     | NULL    |                |
-| school    | varchar(100) | NO   |     | NULL    |                |
-+-----------+--------------+------+-----+---------+----------------+
-
 MariaDB [schoolProjectDB]> select * from users;
-+----------+------------------------------------------------------------------+---------+-------+---------+----------+----------------------+---------+------+
-| username | password                                                         | school  | grade | section | dob      | email                | role    | uuid |
-+----------+------------------------------------------------------------------+---------+-------+---------+----------+----------------------+---------+------+
-| owner    | 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8 | none    |     0 | NULL    | NULL     | owner@owner.com      | owner   |    1 |
-| Arjun    | 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8 | unknown |    11 | A       | 1/1/1800 | arjun@educonnect.com | student |    2 |
-+----------+------------------------------------------------------------------+---------+-------+---------+----------+----------------------+---------+------+
-
-MariaDB [schoolProjectDB]> select * from assignments;
-+------+-----------+------------+------------+-------+---------+---------+
-| uaid | subject   | startdate  | enddate    | grade | section | school  |
-+------+-----------+------------+------------+-------+---------+---------+
-|    1 | physics   | 10/11/2023 | 30/12/2023 |    11 | A       | unknown |
-|    2 | chemistry | NULL       | NULL       |    11 | A       | unknown |
-+------+-----------+------------+------------+-------+---------+---------+
++------------+------------------------------------------------------------------+---------+-------+---------+----------+----------------------+---------+------+------------------+
+| username   | password                                                         | school  | grade | section | dob      | email                | role    | uuid | teaching_classes |
++------------+------------------------------------------------------------------+---------+-------+---------+----------+----------------------+---------+------+------------------+
+| owner      | 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8 | none    |     0 | *       | NULL     | owner@owner.com      | owner   |    1 | NULL             |
+| Arjun      | 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8 | unknown |    11 | A       | 1/1/1800 | arjun@educonnect.com | student |    2 | NULL             |
+| teacherxyz | 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8 | unknown |     0 | *       | 1/1/1700 | xyz@educonnect.com   | teacher |    3 | 11A,11B,12A      |
++------------+------------------------------------------------------------------+---------+-------+---------+----------+----------------------+---------+------+------------------+
