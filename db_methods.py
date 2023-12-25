@@ -1,3 +1,5 @@
+from classes import User
+
 def create_cursor_from_conn(conn):
     return conn.cursor(dictionary = True)
 
@@ -6,18 +8,22 @@ def get_user_from_login(conn, user_details):
 
     cursor = create_cursor_from_conn(conn)
     cursor.execute("SELECT * FROM users WHERE email = %s AND password = %s;", (user_details["email"], user_details["password"]))
-    valid_users = cursor.fetchall()
+    user_data = cursor.fetchall()[0]
 
-    return valid_users[0] if valid_users != [] else None
+    user = User(["username"], user_data["password"], user_data["uuid"], user_data["email"], user_data["school"], user_data["grade"], user_data["section"], user_data["dob"], user_data["role"], user_data["teaching_classes"])
+
+    return user if user_data != None else None
 
 def get_user_from_uuid(conn, uuid):
     assert conn.is_connected(), "Connection to database has not been established."
 
     cursor = create_cursor_from_conn(conn)
     cursor.execute("SELECT * FROM users WHERE uuid = %s;", [uuid])
-    user_data = cursor.fetchall()
+    user_data = (cursor.fetchall())[0]
     
-    return user_data[0] if user_data != [] else None
+    user = User(user_data["username"], user_data["password"], user_data["uuid"], user_data["email"], user_data["school"], user_data["grade"], user_data["section"], user_data["dob"], user_data["role"], user_data["teaching_classes"])
+
+    return user if user_data != None else None
 
 def get_assignments_from_class_details(conn, class_details):
     assert conn.is_connected(), "Connection to database has not been established."
@@ -61,3 +67,5 @@ def add_assignment(conn, assignment_details):
 
     conn.commit()
     return 0
+
+

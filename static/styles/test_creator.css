@@ -1,0 +1,26 @@
+#test-creator-container {
+	white-space: nowrap;
+	position: relative;
+}
+
+.test-creator-page {
+	display: inline-block;
+	vertical-align: top;
+	position: relative;
+}
+
+.test-creator-page-btns-container {
+	position: fixed;
+	bottom: 10px;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.test-creator-finalize-btn {
+	background: blue;
+	color: white;
+}
+
+.test-creator-correct-option-input {
+	width: 125px;
+}

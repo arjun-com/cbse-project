@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+	<head>
+		<title>Dashboard</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link href="{{ url_for("static", filename = "styles/test_creator.css") }}" rel="stylesheet">
+		<link href="{{ url_for("static", filename = "styles/globals.css") }}" rel="stylesheet">
+
+		<script src="{{ url_for('static', filename = 'scripts/test_creation_handler.js') }}" defer></script>
+	</head>
+	<body>
+		<section class = "padding-large">
+			<div id = "test-creator-container" class = "fill-in-parent rounded-corners border-thin-black hide-overflow">
+				<div class = "padding-small min-width test-creator-page-btns-container">
+					<button disabled onclick = "move_test_creator_pages(-1)" id = "test-creator-prev-page-btn" class = "padding-medium rounded-corners font-medium">Back</button>
+					<button onclick = "finalize_test_creator_page()" class = "test-creator-finalize-btn padding-medium rounded-corners font-medium">Submit</button>
+					<button onclick = "move_test_creator_pages(+1)" class = "padding-medium rounded-corners font-medium">Next</button>
+				</div>
+
+				<div id = "test-creator-metadata-page" class = "test-creator-page fill-in-parent padding-large">
+					<label for = "subject" class = "padding-medium font-medium">Which subject will this test be on?</label><br>
+					<input class = "test-creator-metadata-input" name = "subject" placeholder="Test Subject"></input><br>
+
+					<label for = "startdatetime" class = "padding-medium font-medium">On what date and at what time should the test begin?</label><br>
+					<input class = "test-creator-metadata-input" name = "startdatetime" type = "datetime-local"></input><br>
+
+					<label for = "enddatetime" class = "padding-medium font-medium">On what date and at what time should the test be disabled for all students?</label><br>
+					<input class = "test-creator-metadata-input" name = "enddatetime" type = "datetime-local"></input><br>
+
+					<label for = "testduration" class = "padding-medium font-medium">How long should the test run for once started by a student? [ In minutes ]</label><br>
+					<input class = "test-creator-metadata-input min-width" name = "testduration" type = "number" step = "5"></input><br>
+				
+					<label for = "class" class = "padding-medium font-medium">Which class should this test be assigned to?</label>
+					<select required name = "class">
+						{% for teaching_class in teaching_classes %}
+							<option>{{ teaching_class }}</option>
+						{% endfor %}
+					</select><br>
+				</div>
+
+				<div class = "test-creator-page test-creator-question-page fill-in-parent padding-large" id = "test-creator-question-page-1">
+					<input class = "test-creator-question-input" name = "question-1" placeholder="Question"></input><br>
+
+					<hr class = "test-creator-section-divider">
+
+					<label class = "padding-medium font-medium">What options would you like the students to have?</label>
+					<button class = "test-creator-add-option-btn padding-medium margin-medium font-medium rounded-corners" onclick = "test_creator_add_option('test-creator-options-container-1')">+</button>
+					<div class = "test-creator-options-container" id = "test-creator-options-container-1"></div>
+
+					<hr class = "test-creator-section-divider">
+
+					<label class = "padding-medium font-medium">Enter the number associated with the correct option</label>
+					<input class = "test-creator-correct-option-input font-medium margin-small" type = "number" step = "1" placeholder=""></input>
+				</div>
+			</div>
+
+		</section>
+	</body>
+</html>

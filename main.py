@@ -7,6 +7,8 @@ from db_connection import init_conn
 from db_methods import *
 from hash_utils import hash_password
 
+# from classes import User
+
 ASSIGNMENTS_DIR = "./static/user_content/assignments/"
 ALLOWED_ASSIGNMENTS_EXTENSIONS = ["pdf"]
 
@@ -19,8 +21,6 @@ except:
 assert jwt_secret_key != "" and jwt_secret_key != None, "secret jwt key must have a valid value."
 
 app = Flask(__name__)
-
-
 
 def class_to_grade_and_section(class_):
     # Named as class_ as class is a reserved keyword.
@@ -56,18 +56,21 @@ def get_assignments():
     user = get_user_from_uuid(conn, uuid)
     if user == None:
         return "Invalid jwt token supplied"
+    
+    if user.role != "student":
+        return "You cannot access this feature."
 
     class_details = {
-        "grade": user["grade"], # 2, 3, 4 are the indices as per the database columns for the assignments table.
-        "section": user["section"],
-        "school": user["school"]
+        "grade": user.grade,
+        "section": user.section,
+        "school": user.school
     }
-
+    
     assignments = get_assignments_from_class_details(conn, class_details)
     if assignments == None:
         return "No assignments."
 
-    return render_template("partials/student_assignments.html", token = jwt_token, len_assignments = len(assignments), assignments = assignments)
+    return render_template("student/partials/assignments.html", token = jwt_token, len_assignments = len(assignments), assignments = assignments)
 
 @app.get("/api_download_assignment")
 def download_assignment():
@@ -112,26 +115,26 @@ def login():
         "password": hash_password(user_data["password"])
     }
 
-    user_details = get_user_from_login(conn, user_login_details)
-    if user_details == None:
+    user = get_user_from_login(conn, user_login_details)
+    if user == None:
         return "Invalid creds"
 
-    jwt_token = jwt.encode({"uuid": user_details["uuid"], "exp": datetime.datetime.utcnow() + datetime.timedelta(days = 1)}, jwt_secret_key, algorithm = "HS256")
+    jwt_token = jwt.encode({"uuid": user.uuid, "exp": datetime.datetime.utcnow() + datetime.timedelta(days = 1)}, jwt_secret_key, algorithm = "HS256")
 
-    if user_details["role"] == "student":
-        return render_template("student_dashboard.html", token = jwt_token, user = user_details)
+    if user.role == "student":
+        return render_template("student/dashboard.html", token = jwt_token, user = user)
 
-    elif user_details["role"] == "teacher":    
-        teaching_classes = user_details["teaching_classes"]
+    elif user.role == "teacher":    
+        teaching_classes = user.teaching_classes
         if teaching_classes != None:
-            teaching_classes =  [ _.strip() for _ in user_details["teaching_classes"].split(",") ]
-        return render_template("teacher_dashboard.html", token = jwt_token, user = user_details, teaching_classes = teaching_classes)
+            teaching_classes = [ teaching_class.strip() for teaching_class in teaching_classes.split(",") ]
+        return render_template("teacher/dashboard.html", token = jwt_token, user = user, teaching_classes = teaching_classes)
 
     else:
         return "A dashboard for this user role has not been created yet."
     
-@app.post("/api_upload_assignment")
-def upload_assignment():
+@app.post("/api_create_assignment")
+def create_assignment():
     jwt_token = request.args.get("token")
     if jwt_token == None:
         return "No token in url."
@@ -144,11 +147,11 @@ def upload_assignment():
     if user == None:
         return "Invalid jwt token supplied"
 
-    if request.form["class"] not in user["teaching_classes"]:
+    if user.teaching_classes != None and request.form["class"] not in user.teaching_classes:
         return "You cannot publish an assignment to that class."
 
     file = request.files["file"]
-    if file.filename == "":
+    if file.filename == "" or file.filename == None:
         return "No file selected. Refresh the page."
 
     if not("." in file.filename and file.filename.rsplit(".")[1].lower() in ALLOWED_ASSIGNMENTS_EXTENSIONS):
@@ -161,7 +164,7 @@ def upload_assignment():
     if user == None:
         return "This user does not exist."
 
-    school = user["school"]
+    school = user.school
     grade, section = class_to_grade_and_section(request.form["class"])
     if grade == None or section == None:
         return "Invalid class selected. Refresh the page"
@@ -186,5 +189,66 @@ def upload_assignment():
         return "Successfully published assignment. Refresh the page."
     else:
         return "An error occurred while publishing the assignment. Refresh the page."
-        
+
+@app.get("/api_create_test")
+def get_test_creator():
+    jwt_token = request.args.get("token")
+    if jwt_token == None:
+        return "No token in url."
+
+    uuid = validate_and_get_uuid_jwt_token(jwt_token)
+    if uuid == None:
+        return "Invalid token supplied."
+    
+    user = get_user_from_uuid(conn, uuid)
+    if user == None:
+        return "Invalid jwt token supplied."
+
+    if user.role != "teacher":
+        return "You cannot access this feature."
+
+    if user.teaching_classes == None:
+        return "You do not teach any classes currently you cannot assign any tests."
+
+    return render_template("teacher/test_creator.html", teaching_classes = [ teaching_class.strip() for teaching_class in user.teaching_classes.split(",") ])
+
+@app.post("/api_create_test")
+def create_test():
+    # jwt_token = request.args.get("token")
+    # if jwt_token == None:
+    #     return "No token in url."
+    #
+    # uuid = validate_and_get_uuid_jwt_token(jwt_token)
+    # if uuid == None:
+    #     return "Invalid token supplied."
+    # 
+    # user = get_user_from_uuid(conn, uuid)
+    # if user == None:
+    #     return "Invalid jwt token supplied"
+    #
+
+    '''
+    {
+        "metadata": {
+            "startdatetime": "12/12/2023@13:00",
+            "enddatetime": "12/12/2023@15:00",
+            "testduration": "90" # Always in minutes,
+            "class": "11A",
+            "subject": "Physics",
+            "chapters": "System of particles, Center of mass"
+        },
+        "questions": {
+            "What is the capital of Russia?": ["Moscow", "England", "Scotland", "Sydney", "Perth"]
+            "What is the color associated with the fastest e.m wave": ["Red", "Blue", "Grey"]
+        }
+    }
+    '''
+    try:
+        data = request.get_json(force = True)
+    except:
+        return "Invalid formmating of test data."
+
+    return "yay it worked"
+
+
 app.run(debug = True, host = "0.0.0.0", port = 8080)

@@ -12,13 +12,13 @@
 		<section>
 			<img class = "user-icon" src = "{{ url_for("static", filename = "media/default-user-icon.png") }}"></img>
 			<ul>
-				<li><p class = "user-field-title">Name: <span class = "user-field-value">{{ user["name"] }}</span></p></li>
-				<li><p class = "user-field-title">School: <span class = "user-field-value"></span>{{ user["school"] }}</p></li>
-				<li><p class = "user-field-title">Date of Birth: <span class = "user-field-value">{{ user["dob"] }}</span></p></li>
-				<li><p class = "user-field-title">Grade: <span class = "user-field-value">{{ user["grade"] }}</span></p></li>
-				<li><p class = "user-field-title">Section: <span class = "user-field-value">{{ user["section"] }}</span></p></li>
-				<li><p class = "user-field-title">Email: <span class = "user-field-value">{{ user["email"] }}</span></p></li>
-				<li><p class = "user-field-title">Role: <span class = "user-field-value">{{ user["role"] }}</span></p></li>
+				<li><p class = "user-field-title">Name: <span class = "user-field-value">{{ user.username }}</span></p></li>
+				<li><p class = "user-field-title">School: <span class = "user-field-value"></span>{{ user.school }}</p></li>
+				<li><p class = "user-field-title">Date of Birth: <span class = "user-field-value">{{ user.dob }}</span></p></li>
+				<li><p class = "user-field-title">Grade: <span class = "user-field-value">{{ user.grade }}</span></p></li>
+				<li><p class = "user-field-title">Section: <span class = "user-field-value">{{ user.section }}</span></p></li>
+				<li><p class = "user-field-title">Email: <span class = "user-field-value">{{ user.email }}</span></p></li>
+				<li><p class = "user-field-title">Role: <span class = "user-field-value">{{ user.role }}</span></p></li>
 			</ul>
 		</section>
 	</body>
