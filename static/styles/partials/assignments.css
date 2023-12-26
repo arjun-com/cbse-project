@@ -1,8 +1,5 @@
 .student-assignment-container {
 	background: var(--background);
-	margin: 2vh 2vw;
-	padding: 2vh 2vw;
-	border: 2px solid var(--primary);
 }
 
 .student-assignment-container:hover {
@@ -21,7 +18,6 @@
 
 .student-assignment-download-btn {
 	text-decoration: none;
-	transition: 0.5s;
 	font-weight: bold;
 	color: var(--highlight);
 }

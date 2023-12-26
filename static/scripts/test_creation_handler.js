@@ -11,6 +11,7 @@ function create_test_creator_question_page() {
 	new_page.getElementsByClassName("test-creator-add-option-btn")[0].setAttribute("onclick", `test_creator_add_option('test-creator-options-container-${test_creator_page_count}')`)
 	new_page.getElementsByClassName("test-creator-options-container")[0].setAttribute("id", `test-creator-options-container-${test_creator_page_count}`)
 
+	new_page.classList.add("animate-fade-in")
 	test_creator_pages_container.appendChild(new_page)
 }
 

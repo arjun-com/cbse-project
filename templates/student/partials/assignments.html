@@ -10,7 +10,7 @@
 	</head>
 	<body>
 		{% for i in range(0, len_assignments) %}
-			<div class = "student-assignment-container">
+			<div class = "student-assignment-container rounded-corners border-thin-black margin-medium padding-medium">
 				<ul>
 					<li><p class = "student-assignment-subject">Subject: <span class = "student-assignment-field-value">{{ assignments[i]["subject"] }}</span></p></li>
 					<li><p class = "student-assignment-startdate">Start: <span class = "student-assignment-field-value">{{ assignments[i]["startdate"] }}</span></p></li>

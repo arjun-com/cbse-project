@@ -19,12 +19,6 @@
 	box-shadow: 0 10px 5px var(--hover-color);
 }
 
-section {
-	margin: 2vh 2vw;
-	padding: 2vh 2vw;
-	border: 2px solid var(--primary);
-}
-
 section:hover {
 	transform: translateY(-2%);
 	box-shadow: 0 10px 10px var(--hover-color);

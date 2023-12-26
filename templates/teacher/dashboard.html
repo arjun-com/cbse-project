@@ -10,7 +10,7 @@
 	</head>
 	<body>
 		<a href = "/api_user_profile?token={{ token }}"><img class = "user-icon" src = "{{ url_for("static", filename = "media/default-user-icon.png") }}" alt = "EduConnect default user icon."></a>
-		<section class = "teacher-assignments-container">
+		<section class = "teacher-assignments-container rounded-corners border-thin-black padding-medium margin-medium">
 			<h2>Publish Assignments</h2>
 			<form action = "/api_create_assignment?token={{ token }}" method = "POST" class = "teacher-assignment-form" enctype = "multipart/form-data">
 				<input name = "subject" required type = "text" placeholder = "Subject"></input><br>

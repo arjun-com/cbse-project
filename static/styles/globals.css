@@ -158,3 +158,18 @@ option {
 .border-fat-black {
 	border: 3px solid black;
 }
+
+.animate-fade-in {
+	animation-name: fade-in;
+	animation-duration: 1.5s;
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0%;
+	}
+
+	to {
+		opacity: 100%
+	}
+}
