@@ -1,4 +1,4 @@
-create user "school-admin"@"localhost" identified by "password";
+create user "school-admin"@"localhost" identified with mysql_native_password by "password";
 grant all privileges on schoolProjectDB.* to "school-admin"@"localhost";
 
 create database schoolProjectDB;

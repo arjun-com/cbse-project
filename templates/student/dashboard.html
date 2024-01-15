@@ -10,9 +10,14 @@
 	</head>
 	<body>
 		<a href = "/api_user_profile?token={{ token }}"><img class = "user-icon" src = "{{ url_for("static", filename = "media/default-user-icon.png") }}" alt = "EduConnect default user icon."></a>
-		<section class = "student-assignments-container rounded-corners border-thin-black">
+		<section class = "student-assignments-container min-width rounded-corners border-thin-black margin-medium padding-medium">
 			<h2>Your Assignments</h2>
-			<iframe src = "/api_get_assignments?token={{ token }}" title = "assignments section">
+			<iframe src = "/api_get_assignments?token={{ token }}" title = "Assignments Section">
+			</iframe>
+		</section>
+		<section class = "student-tests-container min-width rounded-corners border-thin-black margin-medium padding-medium">
+			<h2>Your Tests</h2>
+			<iframe src = "/api_get_tests?token={{ token }}" title = "Tests Section">
 			</iframe>
 		</section>
 	</body>

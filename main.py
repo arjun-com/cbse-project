@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 import jwt
 import json
 import datetime
 import os
+import sys
 from db_connection import init_conn
 from db_methods import *
 from hash_utils import hash_password
@@ -27,7 +28,7 @@ def class_to_grade_and_section(class_):
     if len(class_) == 2:
         return (class_[ : 1], class_[1 : ])
     if len(class_) == 3:
-        return (class_[ : 2], class_[2 :])
+        return (class_[ : 2], class_[2 : ])
     return (None, None)
 
 def validate_and_get_uuid_jwt_token(token):
@@ -110,10 +111,13 @@ def get_user_profile():
 def login():
     user_data = request.form
 
-    user_login_details = {
-        "email": user_data["email"],
-        "password": hash_password(user_data["password"])
-    }
+    try:
+        user_login_details = {
+            "email": user_data["email"],
+            "password": hash_password(user_data["password"])
+        }
+    except:
+        return "Invalid creds"
 
     user = get_user_from_login(conn, user_login_details)
     if user == None:
@@ -214,41 +218,79 @@ def get_test_creator():
 
 @app.post("/api_create_test")
 def create_test():
-    # jwt_token = request.args.get("token")
-    # if jwt_token == None:
-    #     return "No token in url."
-    #
-    # uuid = validate_and_get_uuid_jwt_token(jwt_token)
-    # if uuid == None:
-    #     return "Invalid token supplied."
-    # 
-    # user = get_user_from_uuid(conn, uuid)
-    # if user == None:
-    #     return "Invalid jwt token supplied"
-    #
+    jwt_token = request.args.get("token")
+    if jwt_token == None:
+        return "No token in url.", 400
 
-    '''
-    {
-        "metadata": {
-            "startdatetime": "12/12/2023@13:00",
-            "enddatetime": "12/12/2023@15:00",
-            "testduration": "90" # Always in minutes,
-            "class": "11A",
-            "subject": "Physics",
-            "chapters": "System of particles, Center of mass"
-        },
-        "questions": {
-            "What is the capital of Russia?": ["Moscow", "England", "Scotland", "Sydney", "Perth"]
-            "What is the color associated with the fastest e.m wave": ["Red", "Blue", "Grey"]
-        }
-    }
-    '''
+    uuid = validate_and_get_uuid_jwt_token(jwt_token)
+    if uuid == None:
+        return "Invalid token supplied.", 400
+
+    user = get_user_from_uuid(conn, uuid)
+    if user == None:
+        return "Invalid jwt token supplied", 400
+
     try:
         data = request.get_json(force = True)
     except:
-        return "Invalid formmating of test data."
+        return "Invalid formmating of test data.", 400
 
-    return "yay it worked"
+    resp_code = add_test(conn, data["metadata"], json.dumps(data["questions"]), user.school, uuid)
+    if resp_code == 0:
+        return "Successfully published test to students."
 
+    return "An error occurred while publishing the test. Try again later.", 503
 
-app.run(debug = True, host = "0.0.0.0", port = 8080)
+@app.get("/api_take_test")
+def take_test():
+    jwt_token = request.args.get("token")
+    if jwt_token == None:
+        return "No token in url.", 400
+
+    uuid = validate_and_get_uuid_jwt_token(jwt_token)
+    if uuid == None:
+        return "Invalid token supplied.", 400
+
+    user = get_user_from_uuid(conn, uuid)
+    if user == None:
+        return "Invalid jwt token supplied", 400
+
+    tests = get_tests_from_uuid(conn, uuid)
+    if tests == None:
+        return "No tests to display"
+    
+    utid = request.args.get("test_id")
+    if not utid or not utid.isdigit:
+        return "No test was specified."
+    
+    test = [x for x in tests if str(x["utid"]) == utid]
+
+    if test == []:
+        return "You cannot take that test."
+    
+    questions = json.loads(test[0]["question_json"])
+    del(test[0]["question_json"])
+
+    return render_template("/student/test_taker.html", token = jwt_token, questions = questions, metadata = test[0], enumerate = enumerate)
+
+@app.get("/api_get_tests")
+def get_tests():
+    jwt_token = request.args.get("token")
+    if jwt_token == None:
+        return "No token in url.", 400
+
+    uuid = validate_and_get_uuid_jwt_token(jwt_token)
+    if uuid == None:
+        return "Invalid token supplied.", 400
+
+    user = get_user_from_uuid(conn, uuid)
+    if user == None:
+        return "Invalid jwt token supplied", 400
+
+    tests = get_tests_from_uuid(conn, uuid)
+    if tests == None:
+        return "No tests to display"
+
+    return render_template("student/partials/tests.html", token = jwt_token,tests = tests, len_tests = len(tests))
+
+app.run(debug = True, host = "127.0.0.1", port = 5335, threaded=True)

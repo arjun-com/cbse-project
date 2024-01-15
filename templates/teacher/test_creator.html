@@ -15,7 +15,7 @@
 			<div id = "test-creator-container" class = "fill-in-parent rounded-corners border-thin-black hide-overflow">
 				<div class = "padding-small min-width test-creator-page-btns-container">
 					<button disabled onclick = "move_test_creator_pages(-1)" id = "test-creator-prev-page-btn" class = "padding-medium rounded-corners font-medium">Back</button>
-					<button onclick = "finalize_test_creator_page()" class = "test-creator-finalize-btn padding-medium rounded-corners font-medium">Submit</button>
+					<button onclick = "publish_test()" class = "test-creator-finalize-btn padding-medium rounded-corners font-medium">Submit</button>
 					<button onclick = "move_test_creator_pages(+1)" class = "padding-medium rounded-corners font-medium">Next</button>
 				</div>
 
@@ -33,7 +33,7 @@
 					<input class = "test-creator-metadata-input min-width" name = "testduration" type = "number" step = "5"></input><br>
 				
 					<label for = "class" class = "padding-medium font-medium">Which class should this test be assigned to?</label>
-					<select required name = "class">
+					<select class = "test-creator-metadata-input" required name = "class">
 						{% for teaching_class in teaching_classes %}
 							<option>{{ teaching_class }}</option>
 						{% endfor %}
@@ -55,7 +55,6 @@
 					<input class = "test-creator-correct-option-input font-medium margin-small" type = "number" step = "1" placeholder=""></input>
 				</div>
 			</div>
-
 		</section>
 	</body>
 </html>

@@ -1,4 +1,4 @@
-from mysql.connector import Error, errorcode, connection
+from mysql.connector import Error, errorcode, connection, pooling
 import json
 
 def init_conn():
@@ -13,18 +13,20 @@ def init_conn():
         raise Exception("Invalid formatting of db_config.js file.")
 
     try:
-        conn = connection.MySQLConnection(
+        conn = pooling.MySQLConnectionPool(
             user = db_config["username"],
             password = db_config["password"],
             database = db_config["database"],
-            host = db_config["host"]
+            host = db_config["host"],
+            pool_name = "School_DB_Pool",
+            pool_size = 5
         )
     except Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             raise Exception("Invalid credentials supplied in database configuration file.")
         elif err.errno == errorcode.ER_BAD_DB_ERROR:
             raise Exception("The database supplied in the database configuration file does not exist.")
-        raise Exception("An error occured while trying to establish a connection with the mysql database.\nPlease check the values provided in the database configuration file.")
+        raise Exception("An error occured while trying to establish a connection with the mysql database.\nPlease check the values provided in the database configuration file.", err)
     
     return conn
 

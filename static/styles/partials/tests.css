@@ -1,0 +1,32 @@
+.student-test-container {
+	background: var(--background);
+}
+
+.student-test-container:hover {
+	transform: translateY(-2%);
+	box-shadow: 0 10px 10px var(--hover-color);
+}
+
+.student-test-container > ul {
+	transform: translateX(10%);
+}
+
+.student-test-container > ul > li > p {
+	color: var(--secondary);
+	text-transform: capitalize;
+}
+
+.student-test-take-btn {
+	text-decoration: none;
+	font-weight: bold;
+	color: var(--highlight);
+}
+
+.student-test-take-btn:hover {
+	color: green;
+}
+
+.student-test-field-value {
+	color: var(--text-color);
+}
+

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for("static", filename = "styles/test_taker.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename = "styles/globals.css") }}" rel="stylesheet">
+
+    <script src="{{ url_for('static', filename = 'scripts/test_taker_handler.js') }}" defer></script>
+
+    <title>Student Test</title>
+</head>
+<body>
+    <section class="padding-large">
+        <div id="test-taker-container" class = "fill-in-parent rounded-corners border-thin-black hide-overflow">
+            <div class = "padding-small min-width test-taker-page-btns-container">
+                <button disabled onclick = "move_test_taker_pages(-1)" id = "test-taker-prev-page-btn" class = "padding-medium rounded-corners font-medium">Back</button>
+                <button onclick = "submit_test()" class = "test-taker-finalize-btn padding-medium rounded-corners font-medium">Submit</button>
+                <button onclick = "move_test_taker_pages(+1)" class = "padding-medium rounded-corners font-medium">Next</button>
+            </div>
+            {% for question in questions %}
+                <div class = "border-thin-black test-taker-page fill-in-parent padding-medium">
+                    <div>
+                        <h2 class = "margin-medium">{{ question["question"] }}</h2>
+                    </div>
+                    <hr class = "margin-medium">
+                    <div>
+                        {% for i, option in enumerate(question["options"]) %}
+                            <button option_index = {{ i }} class = "test-taker-option-btn padding-medium font-medium margin-medium">{{ option }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</body>
+</html>

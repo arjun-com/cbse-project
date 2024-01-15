@@ -19,6 +19,11 @@
 	box-shadow: 0 10px 5px var(--hover-color);
 }
 
+section {
+	display: inline-block;
+	vertical-align: top;
+}
+
 section:hover {
 	transform: translateY(-2%);
 	box-shadow: 0 10px 10px var(--hover-color);
@@ -31,10 +36,3 @@ iframe {
 	border: none;
 }
 
-.student-assignments-container {
-	width: fit-content;
-}
-
-.teacher-assignments-container {
-	width: fit-content;
-}
