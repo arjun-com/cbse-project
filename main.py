@@ -234,6 +234,8 @@ def create_test():
         data = request.get_json(force = True)
     except:
         return "Invalid formmating of test data.", 400
+    
+    # TODO: validate test questions and format.
 
     resp_code = add_test(conn, data["metadata"], json.dumps(data["questions"]), user.school, uuid)
     if resp_code == 0:
@@ -271,7 +273,30 @@ def take_test():
     questions = json.loads(test[0]["question_json"])
     del(test[0]["question_json"])
 
+    # TODO: Make storage to store all ongoing tests along with the JWT Token of the student.
+
     return render_template("/student/test_taker.html", token = jwt_token, questions = questions, metadata = test[0], enumerate = enumerate)
+
+@app.post("/api_submit_test")
+def submit_test():
+    jwt_token = request.args.get("token")
+    if jwt_token == None:
+        return "No token in url.", 400
+
+    uuid = validate_and_get_uuid_jwt_token(jwt_token)
+    if uuid == None:
+        return "Invalid token supplied.", 400
+
+    user = get_user_from_uuid(conn, uuid)
+    if user == None:
+        return "Invalid jwt token supplied", 400
+    
+    # WIP
+    data = request.get_json(force = True)
+    app.logger.info("%s", data) # Temporary
+
+    return "", 200
+    
 
 @app.get("/api_get_tests")
 def get_tests():

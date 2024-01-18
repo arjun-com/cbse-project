@@ -24,3 +24,7 @@
 .test-taker-correct-option-input {
 	width: 125px;
 }
+
+.selected-option {
+	filter: invert(100%);
+}

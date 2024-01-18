@@ -18,15 +18,15 @@
                 <button onclick = "submit_test()" class = "test-taker-finalize-btn padding-medium rounded-corners font-medium">Submit</button>
                 <button onclick = "move_test_taker_pages(+1)" class = "padding-medium rounded-corners font-medium">Next</button>
             </div>
-            {% for question in questions %}
+            {% for question_i, question in enumerate(questions) %}
                 <div class = "border-thin-black test-taker-page fill-in-parent padding-medium">
                     <div>
                         <h2 class = "margin-medium">{{ question["question"] }}</h2>
                     </div>
                     <hr class = "margin-medium">
                     <div>
-                        {% for i, option in enumerate(question["options"]) %}
-                            <button option_index = {{ i }} class = "test-taker-option-btn padding-medium font-medium margin-medium">{{ option }}</button>
+                        {% for option_i, option in enumerate(question["options"]) %}
+                            <button id = "question-{{ question_i }}-option-{{ option_i }}" class = "question-{{ question_i }}-options test-taker-option-btn padding-medium font-medium margin-medium" onclick = 'select_option({{ option_i }}, {{ question_i }})' >{{ option }}</button>
                         {% endfor %}
                     </div>
                 </div>

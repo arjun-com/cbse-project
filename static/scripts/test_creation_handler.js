@@ -130,7 +130,7 @@ function publish_test() {
 
 		else {
 			alert("The test failed to publish. Please try again.")
-			location.href = `/api_create_test?token=${localStorage.getItem("token")}`
+			location.href = `#`
 		}
 	})
 }
