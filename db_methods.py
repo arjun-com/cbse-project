@@ -71,13 +71,16 @@ def get_latest_uaid_for_school(conn, school):
     cursor = create_cursor_from_pool_conn(pool_conn)
 
     cursor.execute("SELECT uaid FROM assignments WHERE school = %s", [school])
-    uaid = (cursor.fetchall()[-1])["uaid"]
+    uaid = cursor.fetchall()
 
     cursor.close()
     pool_conn.commit()
     pool_conn.close()
 
-    return uaid
+    if len(uaid) == 0:
+        return 1
+    
+    return uaid[-1]["uaid"]
 
 def add_assignment(conn, assignment_details):
     assert assignment_details["school"], "A school must be specified to assign an assignment to."
@@ -99,6 +102,8 @@ def add_assignment(conn, assignment_details):
     return 0
 
 def get_tests_from_uuid(conn, uuid):
+    assert uuid, "The uuid of the person must be provided."
+
     user = get_user_from_uuid(conn, uuid)
 
     pool_conn = create_pool_conn_from_conn(conn)
@@ -107,14 +112,33 @@ def get_tests_from_uuid(conn, uuid):
     cursor.execute("SELECT * FROM tests WHERE school = %s AND class = %s", (user.school, f"{user.grade}{user.section}"))
     tests = cursor.fetchall()
 
+    cursor.close()
+    pool_conn.commit()
+    pool_conn.close()
+
     if len(tests) == 0:
         return None
+
+    return tests
+
+def get_test_from_utid(conn, utid):
+    assert utid, "The utid of the test must be provided."
+    pool_conn = create_pool_conn_from_conn(conn)
+    cursor = create_cursor_from_pool_conn(pool_conn)
+
+    cursor.execute("SELECT * FROM tests WHERE utid = %s", (utid,))
+    test = cursor.fetchall()
 
     cursor.close()
     pool_conn.commit()
     pool_conn.close()
 
-    return tests
+    if len(test) == 0:
+        return None
+    
+    return test[0]
+    
+
 
 def add_test(conn, metadata, question_data, school, uuid):
     assert school, "A school must be specified to create a test for."
@@ -135,11 +159,65 @@ def add_test(conn, metadata, question_data, school, uuid):
 
     try:
         cursor.execute("INSERT INTO tests(subject, school, startdate, starttime, enddate, endtime, testduration, class, assigner_uuid, question_json) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (metadata["subject"], school, startdate, starttime, enddate, endtime, metadata["testduration"], metadata["class"], uuid, str(question_data)))
-    except Exception as e:
-        return e
+    except:
+        return -1
 
     cursor.close()
     pool_conn.commit()
     pool_conn.close()
 
     return 0
+
+def add_test_score(conn, utid, uuid, score):
+    assert utid, "The utid of the test must be provided."
+    assert uuid, "The uuid of the person must be provided."
+    assert score, "The score of the test mustb be provided."
+    assert type(score) == int, "Score must be provided in int datatype."
+
+    pool_conn = create_pool_conn_from_conn(conn)
+    cursor = create_cursor_from_pool_conn(pool_conn)
+
+    try:
+        cursor.execute("INSERT INTO test_scores(utid, uuid, score) VALUES(%s, %s, %s)", (utid, uuid, score))
+    except:
+        return -1
+    
+    cursor.close()
+    pool_conn.commit()
+    pool_conn.close()
+
+    return 0
+
+def get_test_score(conn, utid, uuid):
+    assert utid, "The utid of the test must be provided."
+    assert uuid, "The uuid of the person must be provided."
+
+    pool_conn = create_pool_conn_from_conn(conn)
+    cursor = create_cursor_from_pool_conn(pool_conn)
+
+    cursor.execute("SELECT * FROM test_scores WHERE utid = %s, uuid = %s", (utid, uuid))
+    score = cursor.fetchall()
+    
+    cursor.close()
+    pool_conn.commit()
+    pool_conn.close()
+
+    if len(score) == 0:
+        return None
+
+    return score[0]
+
+def get_test_scores_from_uuid(conn, uuid):
+    assert uuid, "The uuid of the person must be provided."
+
+    pool_conn = create_pool_conn_from_conn(conn)
+    cursor = create_cursor_from_pool_conn(pool_conn)
+
+    cursor.execute("SELECT * FROM test_scores WHERE uuid = %s", (uuid,))
+    scores = cursor.fetchall()
+    
+    cursor.close()
+    pool_conn.commit()
+    pool_conn.close()
+
+    return scores

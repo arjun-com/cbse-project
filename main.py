@@ -243,6 +243,8 @@ def create_test():
 
     return "An error occurred while publishing the test. Try again later.", 503
 
+active_tests = {}
+
 @app.get("/api_take_test")
 def take_test():
     jwt_token = request.args.get("token")
@@ -265,17 +267,20 @@ def take_test():
     if not utid or not utid.isdigit:
         return "No test was specified."
     
-    test = [x for x in tests if str(x["utid"]) == utid]
+    test = get_test_from_utid(conn, utid)
 
-    if test == []:
+    if test == None:
         return "You cannot take that test."
     
-    questions = json.loads(test[0]["question_json"])
-    del(test[0]["question_json"])
+    questions = json.loads(test["question_json"])
+    del(test["question_json"])
+    # TODO: add check to check if the user has already taken the test.
+    # TODO: add check for time constraint on test.
 
-    # TODO: Make storage to store all ongoing tests along with the JWT Token of the student.
+    active_tests[jwt_token] = utid
+    # TODO: add check for already existing active tests incase a user closed the browser window during a test.
 
-    return render_template("/student/test_taker.html", token = jwt_token, questions = questions, metadata = test[0], enumerate = enumerate)
+    return render_template("/student/test_taker.html", token = jwt_token, questions = questions, metadata = test, enumerate = enumerate)
 
 @app.post("/api_submit_test")
 def submit_test():
@@ -291,11 +296,32 @@ def submit_test():
     if user == None:
         return "Invalid jwt token supplied", 400
     
-    # WIP
     data = request.get_json(force = True)
-    app.logger.info("%s", data) # Temporary
+    # TODO: add validation of answer data.
 
-    return "", 200
+    try:
+        utid = active_tests[jwt_token]
+    except:
+        return "You cannot access this test.", 400
+    
+    test = get_test_from_utid(conn, utid)
+    if test == None:
+        return "You cannot access this test.", 400
+    
+    questions = json.loads(test["question_json"])
+    correct_answers = [x["correct_option"] for x in questions]
+
+    score = 0
+
+    for answer in data.items():
+        if answer[0].isdigit() and type(answer[1]) == int and 0 <= int(answer[0]) < len(correct_answers) and int(answer[1] + 1) == int(correct_answers[int(answer[0])]):
+            score += 1
+
+    # TODO: Implement feature to store all answers of user so they can see where they went wrong.
+    if add_test_score(conn, utid, uuid, score) != 0:
+        return "An error occurred while submitting the test.", 400
+
+    return "Successfully submitted test.", 200
     
 
 @app.get("/api_get_tests")
@@ -315,7 +341,22 @@ def get_tests():
     tests = get_tests_from_uuid(conn, uuid)
     if tests == None:
         return "No tests to display"
+    
+    taken_tests = get_test_scores_from_uuid(conn, uuid)
+    taken_test_utids = []
+    taken_test_scores = []
 
-    return render_template("student/partials/tests.html", token = jwt_token,tests = tests, len_tests = len(tests))
+    for taken_test in taken_tests:
+        taken_test_utids.append(taken_test["utid"])
+        taken_test_scores.append(taken_test["score"])
+
+    for test in tests:
+        if test["utid"] in taken_test_utids:
+            test["taken"] = True
+            test["score"] = taken_test_scores[taken_test_utids.index(test["utid"])]
+        else:
+            test["taken"] = False
+
+    return render_template("student/partials/tests.html", token = jwt_token, tests = tests, len_tests = len(tests))
 
 app.run(debug = True, host = "127.0.0.1", port = 5335, threaded=True)
