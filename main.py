@@ -274,7 +274,6 @@ def take_test():
     questions = json.loads(test["question_json"])
     del(test["question_json"])
     # TODO: add check to check if the user has already taken the test.
-    # TODO: add check for time constraint on test.
 
     active_tests[jwt_token] = {
         "utid": utid,
