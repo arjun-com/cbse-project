@@ -2,6 +2,7 @@ create user IF NOT EXISTS "school-admin"@"localhost" identified with mysql_nativ
 grant all privileges on schoolProjectDB.* to "school-admin"@"localhost";
 
 create database IF NOT EXISTS schoolProjectDB;
+use schoolProjectDB;
 
 create table IF NOT EXISTS users(
     uuid int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
