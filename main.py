@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect
+from datetime import datetime, timedelta
 import jwt
 import json
-import datetime
 import os
 import sys
 from db_connection import init_conn
@@ -106,7 +106,6 @@ def get_user_profile():
 
     return render_template("profile.html", token = jwt_token, user = user)
 
-
 @app.post("/api_login")
 def login():
     user_data = request.form
@@ -123,7 +122,7 @@ def login():
     if user == None:
         return "Invalid creds"
 
-    jwt_token = jwt.encode({"uuid": user.uuid, "exp": datetime.datetime.utcnow() + datetime.timedelta(days = 1)}, jwt_secret_key, algorithm = "HS256")
+    jwt_token = jwt.encode({"uuid": user.uuid, "exp": datetime.utcnow() + timedelta(days = 1)}, jwt_secret_key, algorithm = "HS256")
 
     if user.role == "student":
         return render_template("student/dashboard.html", token = jwt_token, user = user)
@@ -277,7 +276,11 @@ def take_test():
     # TODO: add check to check if the user has already taken the test.
     # TODO: add check for time constraint on test.
 
-    active_tests[jwt_token] = utid
+    active_tests[jwt_token] = {
+        "utid": utid,
+        "startdatetime": datetime.now(),
+        "duration": test["testduration"]
+    }
     # TODO: add check for already existing active tests incase a user closed the browser window during a test.
 
     return render_template("/student/test_taker.html", token = jwt_token, questions = questions, metadata = test, enumerate = enumerate)
@@ -300,9 +303,16 @@ def submit_test():
     # TODO: add validation of answer data.
 
     try:
-        utid = active_tests[jwt_token]
+        user_test_data = active_tests[jwt_token]
     except:
         return "You cannot access this test.", 400
+    
+    utid = user_test_data["utid"]
+    duration_taken = (datetime.now() - user_test_data["startdatetime"]).total_seconds() / 60
+    if duration_taken > user_test_data["duration"]:
+        return "You did not submit the test in the stipulated amount of time.", 400
+    
+    app.logger.info("DURATION TAKEN: ", duration_taken)
     
     test = get_test_from_utid(conn, utid)
     if test == None:
@@ -359,4 +369,4 @@ def get_tests():
 
     return render_template("student/partials/tests.html", token = jwt_token, tests = tests, len_tests = len(tests))
 
-app.run(debug = True, host = "127.0.0.1", port = 5335, threaded=True)
+app.run(debug = True, host = "192.168.1.2", port = 5335, threaded=True)

@@ -138,8 +138,6 @@ def get_test_from_utid(conn, utid):
     
     return test[0]
     
-
-
 def add_test(conn, metadata, question_data, school, uuid):
     assert school, "A school must be specified to create a test for."
     assert uuid, "The uuid of the person who assigned this test must be provided."
@@ -171,7 +169,7 @@ def add_test(conn, metadata, question_data, school, uuid):
 def add_test_score(conn, utid, uuid, score):
     assert utid, "The utid of the test must be provided."
     assert uuid, "The uuid of the person must be provided."
-    assert score, "The score of the test mustb be provided."
+    assert score >= 0, "The score of the test must be provided."
     assert type(score) == int, "Score must be provided in int datatype."
 
     pool_conn = create_pool_conn_from_conn(conn)

@@ -57,15 +57,16 @@ function submit_test() {
                 "Content-type": "application/json; charset=UTF-8"
             }
         }
-    ).then(function(resp) {
+    ).then(async function(resp) {
         if(resp.status == 200) {
             alert("Successfuly submitted test.")
             location.href = "/"
         }
 
         else {
-            alert("Something went wrong. The test has not been submitted.")
-            location.href = "#"
+            await resp.text().then(function(text) {
+                alert(text)
+            })
         }
     })
 }
