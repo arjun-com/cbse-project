@@ -70,3 +70,17 @@ function submit_test() {
         }
     })
 }
+
+function handle_test_time(minutes) {
+    const holder = document.getElementById("seconds-left")
+    let sec = (minutes * 60) - 15
+    
+    setInterval(function() {
+        sec -= 1
+        holder.innerText = sec
+        if(sec < 0) {
+            submit_test()
+            return
+        }
+    }, 1000)
+}

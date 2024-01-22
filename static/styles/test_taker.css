@@ -28,3 +28,9 @@
 .selected-option {
 	filter: invert(100%);
 }
+
+.test-taker-timer-container {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+}

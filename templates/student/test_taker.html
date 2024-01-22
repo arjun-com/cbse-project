@@ -6,13 +6,15 @@
     <link href="{{ url_for("static", filename = "styles/test_taker.css") }}" rel="stylesheet">
     <link href="{{ url_for("static", filename = "styles/globals.css") }}" rel="stylesheet">
 
-    <script src="{{ url_for('static', filename = 'scripts/test_taker_handler.js') }}" defer></script>
 
     <title>Student Test</title>
 </head>
 <body>
     <section class="padding-large">
         <div id="test-taker-container" class = "fill-in-parent rounded-corners border-thin-black hide-overflow">
+            <div class = "test-taker-timer-container padding-medium border-thin-black rounded-corners">
+                <h2 class = "test-taker-timer">Seconds Left: <span id = "seconds-left">0</span></h2>
+            </div>
             <div class = "padding-small min-width test-taker-page-btns-container">
                 <button disabled onclick = "move_test_taker_pages(-1)" id = "test-taker-prev-page-btn" class = "padding-medium rounded-corners font-medium">Back</button>
                 <button onclick = "submit_test()" class = "test-taker-finalize-btn padding-medium rounded-corners font-medium">Submit</button>
@@ -34,4 +36,8 @@
         </div>
     </section>
 </body>
+<script src="{{ url_for('static', filename = 'scripts/test_taker_handler.js') }}"></script>
+<script>
+    handle_test_time({{ metadata["testduration"] }})
+</script>
 </html>
