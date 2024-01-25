@@ -271,6 +271,12 @@ def take_test():
     if test == None:
         return "You cannot take that test."
     
+    datetime_start = datetime.strptime(test["startdate"] + " " + test["starttime"], "%Y-%m-%d %H:%M")
+    datetime_end = datetime.strptime(test["enddate"] + " " + test["endtime"], "%Y-%m-%d %H:%M")
+    
+    if datetime_start > datetime.now() or datetime_end < datetime.now():
+        return "This test cannot be taken at the moment."
+    
     questions = json.loads(test["question_json"])
     del(test["question_json"])
     # TODO: add check to check if the user has already taken the test.
@@ -368,4 +374,4 @@ def get_tests():
 
     return render_template("student/partials/tests.html", token = jwt_token, tests = tests, len_tests = len(tests))
 
-app.run(debug = True, host = "192.168.1.2", port = 5335, threaded=True)
+app.run(debug = True, host = "localhost", port = 5335, threaded=True)
