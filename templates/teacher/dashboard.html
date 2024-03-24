@@ -5,14 +5,12 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
-		<link href="{{ url_for("static", filename = "styles/globals.css") }}" rel="stylesheet">
-		<link href="{{ url_for("static", filename = "styles/dashboard.css") }}" rel="stylesheet">
 		<link href="{{ url_for("static", filename = "styles/main.css") }}" rel="stylesheet">
 	</head>
 	<body>
 		{% include 'partials/navbar.html' %}
 		
-		<a href = "/api_user_profile?token={{ token }}"><img class = "user-icon" src = "{{ url_for("static", filename = "media/default-user-icon.png") }}" alt = "EduConnect default user icon."></a>
+		<a href = "/api_user_profile?token={{ token }}"><img class = "fixed p-4 top-2 right-2 user-icon w-28 h-28 rounded-full border-black border-2 hover:scale-110 transition-all transform" src = "{{ url_for("static", filename = "media/default-user-icon.png") }}" alt = "EduConnect default user icon."></a>
 	</body>
 
 	<script>

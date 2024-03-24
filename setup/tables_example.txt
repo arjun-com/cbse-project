@@ -6,3 +6,5 @@ MariaDB [schoolProjectDB]> select * from users;
 | Arjun      | 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8 | unknown |    11 | A       | 1/1/1800 | arjun@educonnect.com | student |    2 | NULL             |
 | teacherxyz | 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8 | unknown |     0 | *       | 1/1/1700 | xyz@educonnect.com   | teacher |    3 | 11A,11B,12A      |
 +------------+------------------------------------------------------------------+---------+-------+---------+----------+----------------------+---------+------+------------------+
+
+OUTDATED IGNORE THIS
