@@ -5,54 +5,64 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
-		<link href="{{ url_for("static", filename = "styles/test_creator.css") }}" rel="stylesheet">
-		<link href="{{ url_for("static", filename = "styles/globals.css") }}" rel="stylesheet">
+		<link href="{{ url_for("static", filename = "styles/main.css") }}" rel="stylesheet">
 
 		<script src="{{ url_for('static', filename = 'scripts/test_creation_handler.js') }}" defer></script>
 	</head>
 	<body>
-		<section class = "padding-large">
-			<div id = "test-creator-container" class = "fill-in-parent rounded-corners border-thin-black hide-overflow">
-				<div class = "padding-small min-width test-creator-page-btns-container">
-					<button disabled onclick = "move_test_creator_pages(-1)" id = "test-creator-prev-page-btn" class = "padding-medium rounded-corners font-medium">Back</button>
-					<button onclick = "publish_test()" class = "test-creator-finalize-btn padding-medium rounded-corners font-medium">Submit</button>
-					<button onclick = "move_test_creator_pages(+1)" class = "padding-medium rounded-corners font-medium">Next</button>
+		{% include 'partials/navbar.html' %}
+
+		<section class = "p-20">
+			<div id = "test-creator-container" class = "w-full h-[800px] rounded-2xl overflow-hidden relative whitespace-nowrap">
+				<div class = "fixed bottom-2 left-1/2 transform -translate-x-1/2 w-max">
+					<button disabled onclick = "move_test_creator_pages(-1)" id = "test-creator-prev-page-btn" class = "p-3 rounded-2xl bg-gray-200 inline-block align-top">
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+							<path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
+						</svg>
+					</button>
+					<button onclick = "publish_test()" class = "p-3 rounded-2xl mx-2 bg-blue-600 text-white montserrat-font font-medium inline-block align-top">Submit</button>
+					<button onclick = "move_test_creator_pages(+1)" class = "p-3 rounded-2xl bg-gray-200 inline-block align-top">
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+							<path stroke-linecap="round" stroke-linejoin="round" d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5" />
+						</svg>
+					</button>
 				</div>
 
-				<div id = "test-creator-metadata-page" class = "test-creator-page fill-in-parent padding-large">
-					<label for = "subject" class = "padding-medium font-medium">Which subject will this test be on?</label><br>
-					<input class = "test-creator-metadata-input" name = "subject" placeholder="Test Subject"></input><br>
+				<div id = "test-creator-metadata-page" class = "test-creator-page w-full h-full p-10 inline-block align-top relative rounded-2xl  bg-gray-200">
+					<h2 class = "my-4 text-center text-6xl montserrat-font text-gray-800 font-semibold">Test Creator Suite</h2>
+					<label for = "subject" class = "text-xl plex-sans-font mt-4">Which subject will this test be on?</label><br>
+					<input class = "test-creator-metadata-input w-[400px] focus:outline-dashed p-3 rounded-2xl plex-sans-font mb-4" name = "subject" placeholder="Test Subject"></input><br>
 
-					<label for = "startdatetime" class = "padding-medium font-medium">On what date and at what time should the test begin?</label><br>
-					<input class = "test-creator-metadata-input" name = "startdatetime" type = "datetime-local"></input><br>
+					<label for = "startdatetime" class = "text-xl plex-sans-font mt-4">On what date and at what time should the test begin?</label><br>
+					<input class = "test-creator-metadata-input w-[400px] focus:outline-dashed p-3 rounded-2xl plex-sans-font mb-4" name = "startdatetime" type = "datetime-local"></input><br>
 
-					<label for = "enddatetime" class = "padding-medium font-medium">On what date and at what time should the test be disabled for all students?</label><br>
-					<input class = "test-creator-metadata-input" name = "enddatetime" type = "datetime-local"></input><br>
+					<label for = "enddatetime" class = "text-xl plex-sans-font mt-4">On what date and at what time should the test be disabled for all students?</label><br>
+					<input class = "test-creator-metadata-input w-[400px] focus:outline-dashed p-3 rounded-2xl plex-sans-font mb-4" name = "enddatetime" type = "datetime-local"></input><br>
 
-					<label for = "testduration" class = "padding-medium font-medium">How long should the test run for once started by a student? [ In minutes ]</label><br>
-					<input class = "test-creator-metadata-input min-width" name = "testduration" type = "number" step = "5"></input><br>
+					<label for = "testduration" class = "text-xl plex-sans-font mt-4">How long should the test run for once started by a student? [ In minutes ]</label><br>
+					<input class = "test-creator-metadata-input w-[400px] focus:outline-dashed p-3 rounded-2xl plex-sans-font mb-4" name = "testduration" type = "number" step = "5"></input><br>
 				
-					<label for = "class" class = "padding-medium font-medium">Which class should this test be assigned to?</label>
-					<select class = "test-creator-metadata-input" required name = "class">
-						{% for teaching_class in teaching_classes %}
+					<label for = "class" class = "text-xl plex-sans-font mt-4">Which class should this test be assigned to?</label><br>
+					<select class = "test-creator-metadata-input w-[400px] focus:outline-dashed p-3 rounded-2xl plex-sans-font mb-4" required name = "class">
+						{% for teaching_class in user.teaching_classes %}
 							<option>{{ teaching_class }}</option>
 						{% endfor %}
 					</select><br>
 				</div>
 
-				<div class = "test-creator-page test-creator-question-page fill-in-parent padding-large" id = "test-creator-question-page-1">
-					<input class = "test-creator-question-input" name = "question-1" placeholder="Question"></input><br>
+				<div class = "test-creator-page test-creator-question-page w-full h-full p-10 rounded-2xl bg-gray-200 inline-block align-top relative" id = "test-creator-question-page-1">
+					<input class = "test-creator-question-input my-4 w-full p-3 plex-sans-font focus:outline-dashed text-lg rounded-2xl" name = "question-1" placeholder="Question"></input><br>
 
-					<hr class = "test-creator-section-divider">
+					<label class = "montserrat-font text-lg mt-4 font-medium">What options would you like the students to have?</label>
+					<button class = "test-creator-add-option-btn mx-2 font-medium rounded-full border-2 p-3 bg-indigo-600 hover:bg-indigo-700 transition-all" onclick = "test_creator_add_option('test-creator-options-container-1')">
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z" />
+						</svg>
+					</button>
+					<div class = "test-creator-options-container grid grid-cols-2 mb-4" id = "test-creator-options-container-1"></div>
 
-					<label class = "padding-medium font-medium">What options would you like the students to have?</label>
-					<button class = "test-creator-add-option-btn padding-medium margin-medium font-medium rounded-corners" onclick = "test_creator_add_option('test-creator-options-container-1')">+</button>
-					<div class = "test-creator-options-container" id = "test-creator-options-container-1"></div>
-
-					<hr class = "test-creator-section-divider">
-
-					<label class = "padding-medium font-medium">Enter the number associated with the correct option</label>
-					<input class = "test-creator-correct-option-input font-medium margin-small" type = "number" step = "1" placeholder=""></input>
+					<label class = "montserrat-font text-lg font-medium my-4">Enter the number associated with the correct option</label>
+					<input class = "test-creator-correct-option-input font-medium margin-small my-4 plex-sans-font text-indigo-600 p-4 rounded-2xl w-min" type = "number" step = "1" placeholder=""></input>
 				</div>
 			</div>
 		</section>

@@ -17,12 +17,21 @@ def get_user_from_login(conn, user_details):
     pool_conn.commit()
     pool_conn.close()
 
-    if user_data:
-        user_data = user_data[0]
-        user = User(["username"], user_data["password"], user_data["uuid"], user_data["email"], user_data["school"], user_data["grade"], user_data["section"], user_data["dob"], user_data["role"], user_data["teaching_classes"])
-        return user
+    if user_data == []:
+        return None
 
-    return None
+    user_data = user_data[0]
+    user = User(["username"], user_data["password"], user_data["uuid"], user_data["email"], user_data["school"], user_data["grade"], user_data["section"], user_data["dob"], user_data["role"])
+
+    if user.role == "teacher":
+        teaching_classes = get_teacher_classes_from_uuid(conn, user.uuid)
+        if teaching_classes == None:
+            return user
+
+        user.teaching_classes = [(str(x["grade"]) + x["section"]) for x in teaching_classes]
+
+    return user
+
 
 def get_user_from_uuid(conn, uuid):
     pool_conn = create_pool_conn_from_conn(conn)
@@ -35,12 +44,33 @@ def get_user_from_uuid(conn, uuid):
     pool_conn.commit()
     pool_conn.close()
 
-    if user_data:
-        user_data = user_data[0]
-        user = User(user_data["username"], user_data["password"], user_data["uuid"], user_data["email"], user_data["school"], user_data["grade"], user_data["section"], user_data["dob"], user_data["role"], user_data["teaching_classes"])
-        return user
+    if user_data == []:
+        return None
+    
+    user_data = user_data[0]
+    user = User(user_data["username"], user_data["password"], user_data["uuid"], user_data["email"], user_data["school"], user_data["grade"], user_data["section"], user_data["dob"], user_data["role"])
 
-    return None
+    if user.role == "teacher":
+        teaching_classes = get_teacher_classes_from_uuid(conn, user.uuid)
+        if teaching_classes == None:
+            return user
+
+        user.teaching_classes = [(str(x["grade"]) + x["section"]) for x in teaching_classes]
+
+    return user
+
+def get_teacher_classes_from_uuid(conn, uuid):
+    pool_conn = create_pool_conn_from_conn(conn)
+    cursor = create_cursor_from_pool_conn(pool_conn)
+
+    cursor.execute("SELECT * FROM teacher_classes WHERE uuid = %s", [uuid])
+    teacher_classes = cursor.fetchall()
+
+    cursor.close()
+    pool_conn.commit()
+    pool_conn.close()
+
+    return teacher_classes if teacher_classes != [] else None
 
 def get_assignments_from_class_details(conn, class_details):
     grade = class_details["grade"]
@@ -92,7 +122,8 @@ def add_assignment(conn, assignment_details):
 
     try:
         cursor.execute("INSERT INTO assignments(subject, startdate, enddate, grade, section, school) values(%s, %s, %s, %s, %s, %s)", (assignment_details["subject"], assignment_details["startdate"], assignment_details["enddate"], assignment_details["grade"], assignment_details["section"], assignment_details["school"]))
-    except:
+    except Exception as e:
+        print(e)
         return -1
 
     cursor.close()
@@ -109,7 +140,7 @@ def get_tests_from_uuid(conn, uuid):
     pool_conn = create_pool_conn_from_conn(conn)
     cursor = create_cursor_from_pool_conn(pool_conn)
 
-    cursor.execute("SELECT * FROM tests WHERE school = %s AND class = %s", (user.school, f"{user.grade}{user.section}"))
+    cursor.execute("SELECT * FROM tests WHERE school = %s AND grade = %s AND section = %s", (user.school, user.grade, user.section))
     tests = cursor.fetchall()
 
     cursor.close()
@@ -145,19 +176,17 @@ def add_test(conn, metadata, question_data, school, uuid):
     assert metadata["startdatetime"], "A start date and time must be provided to create a test."
     assert metadata["enddatetime"], "An end date and time must be provided to create a test."
     assert metadata["testduration"], "The duration of the test must be set to create a test."
-    assert metadata["class"], "The class to which the test will be assigned must be specified."
+    assert metadata["grade"], "The grade to which the test will be assigned must be specified."
+    assert metadata["section"], "The section to which the test will be assigned must be specified."
     assert len(question_data) > 0, "The test must have atleast one question."
-
-    startdate, starttime = metadata["startdatetime"].split("T")
-    enddate, endtime = metadata["enddatetime"].split("T")
-    # Add date and time validation
 
     pool_conn = create_pool_conn_from_conn(conn)
     cursor = create_cursor_from_pool_conn(pool_conn)
 
     try:
-        cursor.execute("INSERT INTO tests(subject, school, startdate, starttime, enddate, endtime, testduration, class, assigner_uuid, question_json) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (metadata["subject"], school, startdate, starttime, enddate, endtime, metadata["testduration"], metadata["class"], uuid, str(question_data)))
-    except:
+        cursor.execute("INSERT INTO tests(subject, school, startdatetime, enddatetime, testduration, grade, section, assigner_uuid, question_json) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)", (metadata["subject"], school, metadata["startdatetime"], metadata["enddatetime"], metadata["testduration"], metadata["grade"], metadata["section"], uuid, str(question_data)))
+    except Exception as e:
+        print(e)
         return -1
 
     cursor.close()
@@ -166,7 +195,7 @@ def add_test(conn, metadata, question_data, school, uuid):
 
     return 0
 
-def add_test_score(conn, utid, uuid, score):
+def add_test_score(conn, utid, uuid, score, max_score):
     assert utid, "The utid of the test must be provided."
     assert uuid, "The uuid of the person must be provided."
     assert score >= 0, "The score of the test must be provided."
@@ -176,7 +205,7 @@ def add_test_score(conn, utid, uuid, score):
     cursor = create_cursor_from_pool_conn(pool_conn)
 
     try:
-        cursor.execute("INSERT INTO test_scores(utid, uuid, score) VALUES(%s, %s, %s)", (utid, uuid, score))
+        cursor.execute("INSERT INTO test_scores(utid, uuid, score, max_score) VALUES(%s, %s, %s, %s)", (utid, uuid, score, max_score))
     except:
         return -1
     

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publish An Assignment</title>
+
+	<link href='{{ url_for("static", filename = "styles/main.css") }}' rel="stylesheet">
+</head>
+<body>
+    {% include 'partials/navbar.html' %}
+
+    <section class = "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-200 p-10 rounded-2xl w-max">
+        <h2 class = "text-gray-800 text-5xl montserrat-font font-semibold text-center my-4">Publish Assignment</h2>
+        <form action = "/api_create_assignment?token={{ token }}" method = "POST" class = "teacher-assignment-form" enctype = "multipart/form-data">
+            <input class = "my-4 w-full p-3 plex-sans-font text-lg rounded-2xl focus:ring-1 outline-none" name = "subject" required type = "text" placeholder = "Subject"></input><br>
+            <label class = "text-xl montserrat-font font-medium ">Start Date and Time</label><br>
+            <input class = "my-4 w-full p-3 plex-sans-font text-lg rounded-2xl focus:ring-1 outline-none" name = "startdate" type = "date"></input><br>
+            <label class = "text-xl montserrat-font font-medium ">End Date and Time</label><br>
+            <input class = "my-4 w-full p-3 plex-sans-font text-lg rounded-2xl focus:ring-1 outline-none" name = "enddate" type = "date"></input><br>
+            <label class = "text-xl montserrat-font font-medium ">Choose Class</label><br>
+            <select required name = "class" class = "my-4 w-max p-3 plex-sans-font text-lg rounded-2xl">
+                {%- if user.teaching_classes != None -%}
+                    {% for teaching_class in user.teaching_classes %}
+                        <option>{{ teaching_class }}</option>
+                    {% endfor %}
+                {% endif %}
+            </select><br>
+            <input class = "my-4 w-full file:py-3 file:px-10 file:cursor-pointer montserrat-font file:text-lg file:rounded-2xl file:border-none file:outline-none file:bg-indigo-600 file:text-white file:font-medium text-lg" name = "file" type = "file" accept = ".pdf" placeholder = "Select a PDF file"></input>
+
+            {%- if user.teaching_classes != None -%}
+                <input class = "w-full montserrat-font bg-green-500 rounded-2xl font-medium font-lg text-white px-10 py-3 my-4 cursor-pointer hover:bg-green-600 transition-all" type = "submit"></input>
+            {% else %}
+                <input value = "You do not teach any classes" disabled></input>
+            {% endif %}
+        </form>
+    </section>
+</body>
+</html>

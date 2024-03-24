@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+	<head>
+		<title>Your Assignments</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link href="{{ url_for("static", filename = "styles/main.css") }}" rel="stylesheet">
+	</head>
+	<body>
+		{% include 'partials/navbar.html' %}
+
+		<div class = "w-[800px] min-h-[800px] h-max fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-200 rounded-2xl p-10">
+			<h2 class = "montserrat-font text-6xl font-semibold text-gray-800 text-center my-4">Your Assignments</h2>
+			{% for i in range(0, len_assignments) %}
+				<div class = "w-full bg-gray-300 rounded-2xl p-6 my-4">
+					<ul>
+						<li><p class = "bg-gray-200 my-4 rounded-2xl p-3 montserrat-font font-medium text-lg text-gray-800">Subject: <span class = "plex-sans-font text-indigo-500">{{ assignments[i]["subject"] }}</span></p></li>
+						<li><p class = "bg-gray-200 my-4 rounded-2xl p-3 montserrat-font font-medium text-lg text-gray-800">Start: <span class = "plex-sans-font text-indigo-500">{{ assignments[i]["startdate"] }}</span></p></li>
+						<li><p class = "bg-gray-200 my-4 rounded-2xl p-3 montserrat-font font-medium text-lg text-gray-800">End: <span class = "plex-sans-font text-indigo-500">{{ assignments[i]["enddate"] }}</span></p></li>
+					</ul>
+					<a class = "transition-all w-full text-center bg-blue-600 hover:bg-blue-700 rounded-2xl p-3 montserrat-font font-medium text-lg my-4 text-white" download = "assignment.pdf" class = "student-assignment-download-btn" href="/api_download_assignment?assignment_id={{ assignments[i]['uaid'] }}">Download Assignment</a> <!-- This feature has not been implemented on the server-side yet. -->
+				</div>
+			{% endfor %}
+		</div>
+	</body>
+</html>

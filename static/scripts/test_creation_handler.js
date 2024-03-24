@@ -49,17 +49,21 @@ function test_creator_add_option(options_container_id) {
 		return
 	}
 
+	let option_container = document.createElement("div")
+	option_container.className = "p-4 w-full h-full"
+
 	let option_num = document.createElement("p")
 	option_num.innerText = options_container.getElementsByClassName("test-creator-option-input").length == null ? 1 : options_container.getElementsByClassName("test-creator-option-input").length + 1
-	option_num.className = "test-creator-option-number margin-small padding-small font-medium border-thin-black rounded-corners min-width"
+	option_num.className = "test-creator-option-number p-3 font-medium bg-gray-300 rounded-l-2xl rounded-bl-2xl w-min inline-block align-top"
 
 	let option_input = document.createElement("input")
-	option_input.className = "test-creator-option-input padding-medium font-small"
+	option_input.className = "test-creator-option-input p-3 rounded-r-2xl rounded-br-2xl inline-block align-top min-w-[400px] focus:outline-dashed"
 	option_input.placeholder = "Enter An Option"
 
-	options_container.appendChild(option_num)
-	options_container.appendChild(option_input)
-	options_container.appendChild(document.createElement("br"))
+	option_container.appendChild(option_num)
+	option_container.appendChild(option_input)
+	options_container.appendChild(option_container)
+	// options_container.appendChild(document.createElement("br"))
 }
 
 function publish_test() {
@@ -125,7 +129,7 @@ function publish_test() {
 	}).then(function(resp) {
 		if(resp.status == 200) {
 			alert("Successfully published test to students.")
-			location.href = "/"
+			location.href = `/api_dashboard?token=${localStorage.getItem("token")}`
 		}
 
 		else {

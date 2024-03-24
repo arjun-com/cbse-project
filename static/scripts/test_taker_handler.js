@@ -38,11 +38,15 @@ function move_test_taker_pages(direction) {
 function select_option(option_idx, question_idx) {
     let neighbouring_option_btns = document.getElementsByClassName(`question-${ question_idx }-options`)
     for(const option_btn of neighbouring_option_btns) {
-        option_btn.classList.remove("selected-option")
+        option_btn.classList.remove("bg-green-600")
+        option_btn.classList.add("text-black")
+        option_btn.classList.remove("text-white")
     }
 
     let selected_btn = document.getElementById(`question-${ question_idx }-option-${ option_idx }`)
-    selected_btn.classList.add("selected-option")
+    selected_btn.classList.add("bg-green-600")
+    selected_btn.classList.add("text-white")
+    selected_btn.classList.remove("text-black")
 
     selected_options[`${question_idx}`] = option_idx
 }
@@ -60,7 +64,7 @@ function submit_test() {
     ).then(async function(resp) {
         if(resp.status == 200) {
             alert("Successfuly submitted test.")
-            location.href = "/"
+            location.href = `/api_dashboard?token=${localStorage.getItem("token")}`
         }
 
         else {

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+	<head>
+		<title>Your Tests</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link href="{{ url_for("static", filename = "styles/main.css") }}" rel="stylesheet">
+	</head>
+	<body>
+		{% include 'partials/navbar.html' %}
+
+		{% for i in range(0, len_tests) %}
+			<div class = "student-test-container bg-gray-200 rounded-2xl h-max m-10 p-10 w-1/2 mx-auto">
+				<div class = "grid grid-cols-2 gap-4">
+					<p class = "montserrat-font font-medium bg-gray-300 rounded-2xl student-test-subject w-full p-3">Subject: <span class = "plex-sans-font font-normal text-indigo-600 student-test-field-value">{{ tests[i]["subject"] }}</span></p>
+					<p class = "montserrat-font font-medium bg-gray-300 rounded-2xl student-test-startdatetime w-full p-3">Start: <span class = "plex-sans-font font-normal text-indigo-600 student-test-field-value">{{ tests[i]["startdatetime"] }}</span></p>
+					<p class = "montserrat-font font-medium bg-gray-300 rounded-2xl student-test-enddatetime w-full p-3">End: <span class = "plex-sans-font font-normal text-indigo-600 student-test-field-value">{{ tests[i]["enddatetime"] }}</span></p>
+					<p class = "montserrat-font font-medium bg-gray-300 rounded-2xl student-test-testduration w-full p-3">Duration: <span class = "plex-sans-font font-normal text-indigo-600 student-test-field-value">{{ tests[i]["testduration"] }} mins</span></p>
+				</div>
+				
+				{% if tests[i]["taken"] == False %}
+					<button class = "student-test-take-btn rounded-2xl bg-blue-600 montserrat-font text-white w-full my-4 py-3 text-lg" onclick = "parent.window.location.href = '/api_take_test?token={{ token }}&test_id={{ tests[i]["utid"] }}'">Take Test</button>
+				{% else %}
+					<button class = "py-3 my-4 rounded-2xl w-full text-lg montserrat-font bg-green-600 text-white" disabled>Score: {{ tests[i]["score"] }} | {{ tests[i]["max_score"] }}</button>
+				{% endif %}
+			</div>
+		{% endfor %}
+	</body>
+</html>

@@ -1,0 +1,28 @@
+<script src='{{ url_for("static", filename = "scripts/navbar_handler.js") }}' defer></script>
+
+<nav class = "hidden w-0 h-screen fixed left-0 top-0 bg-gray-100 p-10 text-center z-20 transition-all" id = "navbar">
+    <div class = "w-full" >
+        <button class = "absolute top-2 right-2 outline-none border-none" onclick = "toggle_navbar()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75 14.25 12m0 0 2.25 2.25M14.25 12l2.25-2.25M14.25 12 12 14.25m-2.58 4.92-6.374-6.375a1.125 1.125 0 0 1 0-1.59L9.42 4.83c.21-.211.497-.33.795-.33H19.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25h-9.284c-.298 0-.585-.119-.795-.33Z" />
+            </svg>
+        </button>
+
+        <h1 class = "mx-auto text-6xl montserrat-font font-semibold text-indigo-600 my-4">EduConnect</h1>
+        <a class = "inline-block w-full mx-auto text-2xl plex-sans-font font-medium rounded-2xl p-3 my-4 bg-indigo-600 text-white ring-2 ring-indigo-600 hover:ring-offset-2 transition-all" href = "/api_dashboard?token={{ token }}">Dashboard</a>
+        {% if user.role == "teacher" %}
+            <a class = "inline-block w-full mx-auto text-2xl plex-sans-font font-medium rounded-2xl p-3 my-4 bg-indigo-600 text-white ring-2 ring-indigo-600 hover:ring-offset-2 transition-all" href = "/api_create_test?token={{ token }}">Create Test</a>
+            <a class = "inline-block w-full mx-auto text-2xl plex-sans-font font-medium rounded-2xl p-3 my-4 bg-indigo-600 text-white ring-2 ring-indigo-600 hover:ring-offset-2 transition-all" href = "/api_create_assignment?token={{ token }}">Create Assignment</a>
+        {% elif user.role == "student" %}
+            <a class = "inline-block w-full mx-auto text-2xl plex-sans-font font-medium rounded-2xl p-3 my-4 bg-indigo-600 text-white ring-2 ring-indigo-600 hover:ring-offset-2 transition-all" href = "/api_get_assignments?token={{ token }}">View Assignments</a>
+            <a class = "inline-block w-full mx-auto text-2xl plex-sans-font font-medium rounded-2xl p-3 my-4 bg-indigo-600 text-white ring-2 ring-indigo-600 hover:ring-offset-2 transition-all" href = "/api_get_tests?token={{ token }}">View Tests</a>
+        {% endif %}
+        <a class = "inline-block w-full mx-auto text-2xl plex-sans-font font-medium rounded-2xl p-3 my-4 bg-indigo-600 text-white ring-2 ring-indigo-600 hover:ring-offset-2 transition-all" href = "/api_user_profile?token={{ token }}">Profile</a>
+    </div>
+</nav>
+
+<button class = "bg-indigo-600 p-4 rounded-full fixed bottom-2 left-2 z-10 shadow-sm shadow-indigo-600 border-none outline-none" onclick = "toggle_navbar()">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 invert">
+        <path  stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+    </svg>
+</button>

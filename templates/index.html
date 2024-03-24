@@ -5,16 +5,15 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
-		<link href="{{ url_for("static", filename = "styles/globals.css") }}" rel="stylesheet">
-		<link href="{{ url_for("static", filename = "styles/index.css") }}" rel="stylesheet">
+		<link href="{{ url_for("static", filename = "styles/main.css") }}" rel="stylesheet">
 	</head>
-	<body>
-		<div class = "main-container">
-			<h1>Login to EduConnect</h1>
-			<form class = "login-form" action = "/api_login" method = "POST">
-				<input type="email" name="email" placeholder="Enter Email">
-				<input type="password" name="password" placeholder="Enter Password">
-				<input type="submit" value="Login">
+	<body class = "relative">
+		<div class = "transform absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-1/2 w-[750px] h-[450px] rounded-2xl bg-gray-200 p-10">
+			<h1 class = "text-indigo-600 text-5xl montserrat-font font-semibold text-center my-4">EduConnect</h1>
+			<form class = "text-center" action = "/api_login" method = "POST">
+				<input class = "text-left w-3/4 my-2 p-3 rounded-2xl plex-sans-font text-lg focus:outline-dashed" type="email" name="email" placeholder="Enter Email">
+				<input class = "text-left w-3/4 my-2 p-3 rounded-2xl plex-sans-font text-lg focus:outline-dashed" type="password" name="password" placeholder="Enter Password">
+				<input class = "w-3/4 my-2 p-3 rounded-2xl plex-sans-font text-lg bg-indigo-500 text-white font-medium cursor-pointer ring-2 ring-indigo-500 hover:ring-offset-2 transition-all" type="submit" value="Login">
 			</form>
 		</div>
 	</body>

@@ -5,20 +5,23 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
-		<link href="{{ url_for("static", filename = "styles/globals.css") }}" rel="stylesheet">
-		<link href="{{ url_for("static", filename = "styles/profile.css") }}" rel="stylesheet">
+		<link href="{{ url_for("static", filename = "styles/main.css") }}" rel="stylesheet">
 	</head>
 	<body>
-		<section>
-			<img class = "user-icon" src = "{{ url_for("static", filename = "media/default-user-icon.png") }}"></img>
+		{% include 'partials/navbar.html' %}
+		<section class = "w-3/4 h-max fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-200 rounded-2xl p-10">
+			<img class = "w-20 h-20 rounded-full" src = "{{ url_for("static", filename = "media/default-user-icon.png") }}"></img>
 			<ul>
-				<li><p class = "user-field-title">Name: <span class = "user-field-value">{{ user.username }}</span></p></li>
-				<li><p class = "user-field-title">School: <span class = "user-field-value"></span>{{ user.school }}</p></li>
-				<li><p class = "user-field-title">Date of Birth: <span class = "user-field-value">{{ user.dob }}</span></p></li>
-				<li><p class = "user-field-title">Grade: <span class = "user-field-value">{{ user.grade }}</span></p></li>
-				<li><p class = "user-field-title">Section: <span class = "user-field-value">{{ user.section }}</span></p></li>
-				<li><p class = "user-field-title">Email: <span class = "user-field-value">{{ user.email }}</span></p></li>
-				<li><p class = "user-field-title">Role: <span class = "user-field-value">{{ user.role }}</span></p></li>
+				<li><p class = "my-4 bg-gray-300 font-medium montserrat-font p-4 rounded-2xl">Name: <span class = "plex-sans-font text-indigo-800">{{ user.username }}</span></p></li>
+				<li><p class = "my-4 bg-gray-300 font-medium montserrat-font p-4 rounded-2xl">School: <span class = "plex-sans-font text-indigo-800">{{ user.school }}</p></li>
+				<li><p class = "my-4 bg-gray-300 font-medium montserrat-font p-4 rounded-2xl">Date of Birth: <span class = "plex-sans-font text-indigo-800">{{ user.dob }}</span></p></li>
+				<li><p class = "my-4 bg-gray-300 font-medium montserrat-font p-4 rounded-2xl">Grade: <span class = "plex-sans-font text-indigo-800">{{ user.grade }}</span></p></li>
+				<li><p class = "my-4 bg-gray-300 font-medium montserrat-font p-4 rounded-2xl">Section: <span class = "plex-sans-font text-indigo-800">{{ user.section }}</span></p></li>
+				<li><p class = "my-4 bg-gray-300 font-medium montserrat-font p-4 rounded-2xl">Email: <span class = "plex-sans-font text-indigo-800">{{ user.email }}</span></p></li>
+				<li><p class = "my-4 bg-gray-300 font-medium montserrat-font p-4 rounded-2xl">Role: <span class = "plex-sans-font text-indigo-800">{{ user.role }}</span></p></li>
+				{% if user.teaching_classes != None %}
+					<li><p class = "my-4 bg-gray-300 font-medium montserrat-font p-4 rounded-2xl">Teaching Classes: <span class = "plex-sans-font text-indigo-800">{{ user.teaching_classes }}</span></p></li>
+				{% endif %}
 			</ul>
 		</section>
 	</body>

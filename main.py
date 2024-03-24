@@ -57,9 +57,6 @@ def get_assignments():
     user = get_user_from_uuid(conn, uuid)
     if user == None:
         return "Invalid jwt token supplied"
-    
-    if user.role != "student":
-        return "You cannot access this feature."
 
     class_details = {
         "grade": user.grade,
@@ -71,11 +68,11 @@ def get_assignments():
     if assignments == None:
         return "No assignments."
 
-    return render_template("student/partials/assignments.html", token = jwt_token, len_assignments = len(assignments), assignments = assignments)
+    return render_template("student/assignments.html", user = user, token = jwt_token, len_assignments = len(assignments), assignments = assignments)
 
 @app.get("/api_download_assignment")
 def download_assignment():
-    # I will not check if the user is logged in or not, because assignments do not really have any harm if it is accessed by someone who is not a user of the site.
+    # Does not check if the user is logged in or not, because assignments do not really have any harm if it is accessed by someone who is not a user of the site.
     assignment_id = request.args.get("assignment_id")
     if assignment_id == None:
         return "No assignment id supplied."
@@ -124,18 +121,52 @@ def login():
 
     jwt_token = jwt.encode({"uuid": user.uuid, "exp": datetime.utcnow() + timedelta(days = 1)}, jwt_secret_key, algorithm = "HS256")
 
+    return redirect("/api_dashboard?token=" + jwt_token, code = 302)
+
+@app.get("/api_dashboard")
+def get_dashboard():
+    jwt_token = request.args.get("token")
+    if jwt_token == None:
+        return "No token in url."
+
+    uuid = validate_and_get_uuid_jwt_token(jwt_token)
+    if uuid == None:
+        return "Invalid token supplied."
+
+    user = get_user_from_uuid(conn, uuid)
+    if user == None:
+        return "Invalid token supplied."
+
     if user.role == "student":
         return render_template("student/dashboard.html", token = jwt_token, user = user)
 
-    elif user.role == "teacher":    
-        teaching_classes = user.teaching_classes
-        if teaching_classes != None:
-            teaching_classes = [ teaching_class.strip() for teaching_class in teaching_classes.split(",") ]
-        return render_template("teacher/dashboard.html", token = jwt_token, user = user, teaching_classes = teaching_classes)
+    elif user.role == "teacher":
+        return render_template("teacher/dashboard.html", token = jwt_token, user = user)
 
     else:
         return "A dashboard for this user role has not been created yet."
+
+@app.get("/api_create_assignment")
+def get_assignment_creator():
+    jwt_token = request.args.get("token")
+    if jwt_token == None:
+        return "No token in url."
+
+    uuid = validate_and_get_uuid_jwt_token(jwt_token)
+    if uuid == None:
+        return "Invalid token supplied."
     
+    user = get_user_from_uuid(conn, uuid)
+    if user == None:
+        return "Invalid token supplied"
+
+    if user.role != "teacher":
+        return "You cannot access this feature."
+    
+    print(user.teaching_classes)
+
+    return render_template("teacher/assignment_creator.html", user = user, token = jwt_token)
+
 @app.post("/api_create_assignment")
 def create_assignment():
     jwt_token = request.args.get("token")
@@ -181,6 +212,8 @@ def create_assignment():
         "subject": request.form["subject"]
     }
 
+    print(assignment_details)
+
     uaid = get_latest_uaid_for_school(conn, school) + 1
     try:
         file.save(os.path.join(ASSIGNMENTS_DIR, f"{uaid}.pdf"))
@@ -212,8 +245,8 @@ def get_test_creator():
 
     if user.teaching_classes == None:
         return "You do not teach any classes currently you cannot assign any tests."
-
-    return render_template("teacher/test_creator.html", teaching_classes = [ teaching_class.strip() for teaching_class in user.teaching_classes.split(",") ])
+    
+    return render_template("teacher/test_creator.html", user = user, token = jwt_token)
 
 @app.post("/api_create_test")
 def create_test():
@@ -235,6 +268,17 @@ def create_test():
         return "Invalid formmating of test data.", 400
     
     # TODO: validate test questions and format.
+
+    data["metadata"]["grade"], data["metadata"]["section"] = class_to_grade_and_section(data["metadata"]["class"])
+    del(data["metadata"]["class"])
+
+    startdatetime = datetime.strptime(data["metadata"]["startdatetime"], "%Y-%m-%dT%H:%M")
+    startdatetime_sqlf = startdatetime.strftime("%Y-%m-%d %H:%M:%S")
+    data["metadata"]["startdatetime"] = startdatetime_sqlf
+
+    enddatetime = datetime.strptime(data["metadata"]["enddatetime"], "%Y-%m-%dT%H:%M")
+    enddatetime_sqlf = enddatetime.strftime("%Y-%m-%d %H:%M:%S")
+    data["metadata"]["enddatetime"] = enddatetime_sqlf
 
     resp_code = add_test(conn, data["metadata"], json.dumps(data["questions"]), user.school, uuid)
     if resp_code == 0:
@@ -271,8 +315,8 @@ def take_test():
     if test == None:
         return "You cannot take that test."
     
-    datetime_start = datetime.strptime(test["startdate"] + " " + test["starttime"], "%Y-%m-%d %H:%M")
-    datetime_end = datetime.strptime(test["enddate"] + " " + test["endtime"], "%Y-%m-%d %H:%M")
+    datetime_start = test["startdatetime"]
+    datetime_end = test["enddatetime"]
     
     if datetime_start > datetime.now() or datetime_end < datetime.now():
         return "This test cannot be taken at the moment."
@@ -288,7 +332,7 @@ def take_test():
     }
     # TODO: add check for already existing active tests incase a user closed the browser window during a test.
 
-    return render_template("/student/test_taker.html", token = jwt_token, questions = questions, metadata = test, enumerate = enumerate)
+    return render_template("/student/test_taker.html", user = user, token = jwt_token, questions = questions, metadata = test, enumerate = enumerate)
 
 @app.post("/api_submit_test")
 def submit_test():
@@ -333,7 +377,7 @@ def submit_test():
             score += 1
 
     # TODO: Implement feature to store all answers of user so they can see where they went wrong.
-    if add_test_score(conn, utid, uuid, score) != 0:
+    if add_test_score(conn, utid, uuid, score, len(correct_answers)) != 0:
         return "An error occurred while submitting the test.", 400
 
     return "Successfully submitted test.", 200
@@ -360,18 +404,21 @@ def get_tests():
     taken_tests = get_test_scores_from_uuid(conn, uuid)
     taken_test_utids = []
     taken_test_scores = []
+    taken_test_max_scores = []
 
     for taken_test in taken_tests:
         taken_test_utids.append(taken_test["utid"])
         taken_test_scores.append(taken_test["score"])
+        taken_test_max_scores.append(taken_test["max_score"])
 
     for test in tests:
         if test["utid"] in taken_test_utids:
             test["taken"] = True
             test["score"] = taken_test_scores[taken_test_utids.index(test["utid"])]
+            test["max_score"] = taken_test_max_scores[taken_test_utids.index(test["utid"])]
         else:
             test["taken"] = False
 
-    return render_template("student/partials/tests.html", token = jwt_token, tests = tests, len_tests = len(tests))
+    return render_template("student/tests.html", user = user, token = jwt_token, tests = tests, len_tests = len(tests))
 
 app.run(debug = True, host = "localhost", port = 5335, threaded=True)

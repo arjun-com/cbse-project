@@ -7,30 +7,12 @@
 
 		<link href="{{ url_for("static", filename = "styles/globals.css") }}" rel="stylesheet">
 		<link href="{{ url_for("static", filename = "styles/dashboard.css") }}" rel="stylesheet">
+		<link href="{{ url_for("static", filename = "styles/main.css") }}" rel="stylesheet">
 	</head>
 	<body>
+		{% include 'partials/navbar.html' %}
+		
 		<a href = "/api_user_profile?token={{ token }}"><img class = "user-icon" src = "{{ url_for("static", filename = "media/default-user-icon.png") }}" alt = "EduConnect default user icon."></a>
-		<section class = "teacher-assignments-container min-width rounded-corners border-thin-black padding-medium margin-medium">
-			<h2>Publish Assignments</h2>
-			<form action = "/api_create_assignment?token={{ token }}" method = "POST" class = "teacher-assignment-form" enctype = "multipart/form-data">
-				<input name = "subject" required type = "text" placeholder = "Subject"></input><br>
-				<label>Start Date</label><br>
-				<input name = "startdate" type = "date"></input><br>
-				<label>End Date</label><br>
-				<input name = "enddate" type = "date"></input><br>
-				<label>Choose Class</label>
-				<select required name = "class">
-					{% for teaching_class in teaching_classes %}
-						<option>{{ teaching_class }}</option>
-					{% endfor %}
-				</select><br>
-				<input name = "file" type = "file" accept = ".pdf" placeholder = "Select a PDF file"></input>
-				<input type = "submit"></input>
-			</form>
-		</section>
-		<section>
-			<a href = "/api_create_test?token={{ token }}">Publish a test</a>
-		</section>
 	</body>
 
 	<script>
