@@ -1,9 +1,9 @@
-create database IF NOT EXISTS schoolProjectDBTEST2;
+create database IF NOT EXISTS schoolProjectDB;
 
 create user IF NOT EXISTS "school-admin"@"localhost" identified by "password";
-grant all privileges on schoolProjectDBTEST2.* to "school-admin"@"localhost";
+grant all privileges on schoolProjectDB.* to "school-admin"@"localhost";
 
-use schoolProjectDBTEST2;
+use schoolProjectDB;
 
 create table IF NOT EXISTS users(
     uuid int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
